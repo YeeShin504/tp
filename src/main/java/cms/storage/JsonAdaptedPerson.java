@@ -16,7 +16,7 @@ import cms.model.person.Name;
 import cms.model.person.Person;
 import cms.model.person.Phone;
 import cms.model.tag.Tag;
-import cms.model.role.Role;
+import cms.model.person.Role;
 import cms.model.person.NusId;
 import cms.model.person.SocUsername;
 import cms.model.person.GithubUsername;
@@ -155,7 +155,7 @@ class JsonAdaptedPerson {
         if (!Role.isValidRole(role)) {
             throw new IllegalValueException(Role.MESSAGE_CONSTRAINTS);
         }
-        final Role modelRole = new Role(role);
+        final Role modelRole = Role.valueOf(role.toUpperCase());
 
         if (tutorialGroup == null) {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT, TutorialGroup.class.getSimpleName()));

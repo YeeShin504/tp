@@ -23,7 +23,7 @@ import cms.model.person.Name;
 import cms.model.person.Person;
 import cms.model.person.Phone;
 import cms.model.tag.Tag;
-import cms.model.role.Role;
+import cms.model.person.Role;
 import cms.model.person.NusId;
 import cms.model.person.SocUsername;
 import cms.model.person.GithubUsername;
@@ -60,7 +60,7 @@ public class AddCommandParser implements Parser<AddCommand> {
         TutorialGroup tutorialGroup = ParserUtil.parseTutorialGroup(argMultimap.getValue(PREFIX_TUTORIALGROUP).get());
         Set<Tag> tagList = ParserUtil.parseTags(argMultimap.getAllValues(PREFIX_TAG));
 
-        Person person = new Person(name, nusId, role, socUsername, githubUsername, phone, email, address, tutorialGroup, tagList);
+        Person person = new Person(name, phone, email, nusId, socUsername, githubUsername, address, role, tutorialGroup, tagList);
 
         return new AddCommand(person);
     }

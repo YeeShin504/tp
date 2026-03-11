@@ -1,4 +1,4 @@
-package cms.model.role;
+package cms.model.person;
 
 import static cms.commons.util.AppUtil.checkArgument;
 import static java.util.Objects.requireNonNull;
@@ -33,23 +33,4 @@ public enum Role {
         return value;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (other == this) {
-            return true;
-        }
-
-        // instanceof handles nulls
-        if (!(other instanceof Role)) {
-            return false;
-        }
-
-        Role otherRole = (Role) other;
-        return value.equals(otherRole.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return value.hashCode();
-    }
 }
