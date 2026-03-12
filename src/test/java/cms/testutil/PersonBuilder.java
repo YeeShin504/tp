@@ -3,11 +3,15 @@ package cms.testutil;
 import java.util.HashSet;
 import java.util.Set;
 
-import cms.model.person.Address;
 import cms.model.person.Email;
+import cms.model.person.GithubUsername;
 import cms.model.person.Name;
+import cms.model.person.NusId;
 import cms.model.person.Person;
 import cms.model.person.Phone;
+import cms.model.person.Role;
+import cms.model.person.SocUsername;
+import cms.model.person.TutorialGroup;
 import cms.model.tag.Tag;
 import cms.model.util.SampleDataUtil;
 
@@ -19,12 +23,20 @@ public class PersonBuilder {
     public static final String DEFAULT_NAME = "Amy Bee";
     public static final String DEFAULT_PHONE = "85355255";
     public static final String DEFAULT_EMAIL = "amy@gmail.com";
-    public static final String DEFAULT_ADDRESS = "123, Jurong West Ave 6, #08-111";
+    public static final String DEFAULT_NUSID = "A0000001B";
+    public static final String DEFAULT_SOCUSERNAME = "amybee";
+    public static final String DEFAULT_GITHUBUSERNAME = "amybee";
+    public static final Role DEFAULT_ROLE = Role.STUDENT;
+    public static final String DEFAULT_TUTORIALGROUP = "T01";
 
     private Name name;
     private Phone phone;
     private Email email;
-    private Address address;
+    private NusId nusId;
+    private SocUsername socUsername;
+    private GithubUsername githubUsername;
+    private Role role;
+    private TutorialGroup tutorialGroup;
     private Set<Tag> tags;
 
     /**
@@ -34,7 +46,11 @@ public class PersonBuilder {
         name = new Name(DEFAULT_NAME);
         phone = new Phone(DEFAULT_PHONE);
         email = new Email(DEFAULT_EMAIL);
-        address = new Address(DEFAULT_ADDRESS);
+        nusId = new NusId(DEFAULT_NUSID);
+        socUsername = new SocUsername(DEFAULT_SOCUSERNAME);
+        githubUsername = new GithubUsername(DEFAULT_GITHUBUSERNAME);
+        role = DEFAULT_ROLE;
+        tutorialGroup = new TutorialGroup(DEFAULT_TUTORIALGROUP);
         tags = new HashSet<>();
     }
 
@@ -45,7 +61,11 @@ public class PersonBuilder {
         name = personToCopy.getName();
         phone = personToCopy.getPhone();
         email = personToCopy.getEmail();
-        address = personToCopy.getAddress();
+        nusId = personToCopy.getNusId();
+        socUsername = personToCopy.getSocUsername();
+        githubUsername = personToCopy.getGithubUsername();
+        role = personToCopy.getRole();
+        tutorialGroup = personToCopy.getTutorialGroup();
         tags = new HashSet<>(personToCopy.getTags());
     }
 
@@ -60,16 +80,8 @@ public class PersonBuilder {
     /**
      * Parses the {@code tags} into a {@code Set<Tag>} and set it to the {@code Person} that we are building.
      */
-    public PersonBuilder withTags(String ... tags) {
+    public PersonBuilder withTags(String... tags) {
         this.tags = SampleDataUtil.getTagSet(tags);
-        return this;
-    }
-
-    /**
-     * Sets the {@code Address} of the {@code Person} that we are building.
-     */
-    public PersonBuilder withAddress(String address) {
-        this.address = new Address(address);
         return this;
     }
 
@@ -89,8 +101,49 @@ public class PersonBuilder {
         return this;
     }
 
+    /**
+     * Sets the {@code NusId} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withNusId(String nusId) {
+        this.nusId = new NusId(nusId);
+        return this;
+    }
+
+    /**
+     * Sets the {@code SocUsername} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withSocUsername(String socUsername) {
+        this.socUsername = new SocUsername(socUsername);
+        return this;
+    }
+
+    /**
+     * Sets the {@code GithubUsername} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withGithubUsername(String githubUsername) {
+        this.githubUsername = new GithubUsername(githubUsername);
+        return this;
+    }
+
+    /**
+     * Sets the {@code Role} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withRole(String role) {
+        this.role = Role.valueOf(role.toUpperCase());
+        return this;
+    }
+
+    /**
+     * Sets the {@code TutorialGroup} of the {@code Person} that we are building.
+     */
+    public PersonBuilder withTutorialGroup(String tutorialGroup) {
+        this.tutorialGroup = new TutorialGroup(tutorialGroup);
+        return this;
+    }
+
     public Person build() {
-        return new Person(name, phone, email, address, tags);
+        return new Person(name, phone, email, nusId, socUsername, githubUsername, role, tutorialGroup, tags);
     }
 
 }
+
