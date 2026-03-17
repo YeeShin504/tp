@@ -22,7 +22,6 @@ import cms.model.Model;
 import cms.model.ReadOnlyAddressBook;
 import cms.model.ReadOnlyUserPrefs;
 import cms.model.person.Person;
-import cms.model.person.exceptions.DuplicatePersonFieldException;
 import cms.testutil.PersonBuilder;
 import javafx.collections.ObservableList;
 
@@ -52,18 +51,6 @@ public class AddCommandTest {
         ModelStub modelStub = new ModelStubWithPerson(validPerson);
 
         assertThrows(CommandException.class, AddCommand.MESSAGE_DUPLICATE_PERSON, () -> addCommand.execute(modelStub));
-    }
-
-    @Test
-    public void execute_duplicateSocUsername_throwsCommandException() {
-        Person validPerson = new PersonBuilder().build();
-        AddCommand addCommand = new AddCommand(validPerson);
-        ModelStub modelStub = new ModelStubRejectingDuplicateSocUsername(validPerson.getSocUsername().value);
-
-        assertThrows(CommandException.class,
-                String.format("A person with SOC username [%s] already exists in the system.",
-                        validPerson.getSocUsername().value),
-                () -> addCommand.execute(modelStub));
     }
 
     @Test
@@ -152,6 +139,11 @@ public class AddCommandTest {
         }
 
         @Override
+        public boolean hasPersonWithConflictingField(Person person) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
         public void deletePerson(Person target) {
             throw new AssertionError("This method should not be called.");
         }
@@ -203,6 +195,12 @@ public class AddCommandTest {
         }
 
         @Override
+        public boolean hasPersonWithConflictingField(Person person) {
+            requireNonNull(person);
+            return false;
+        }
+
+        @Override
         public void addPerson(Person person) {
             requireNonNull(person);
             personsAdded.add(person);
@@ -211,31 +209,6 @@ public class AddCommandTest {
         @Override
         public ReadOnlyAddressBook getAddressBook() {
             return new AddressBook();
-        }
-    }
-
-    /**
-     * A Model stub that rejects a duplicate SOC username during add.
-     */
-    private class ModelStubRejectingDuplicateSocUsername extends ModelStub {
-        private final String duplicateSocUsername;
-
-        ModelStubRejectingDuplicateSocUsername(String duplicateSocUsername) {
-            this.duplicateSocUsername = duplicateSocUsername;
-        }
-
-        @Override
-        public boolean hasPerson(Person person) {
-            requireNonNull(person);
-            return false;
-        }
-
-        @Override
-        public void addPerson(Person person) {
-            requireNonNull(person);
-            if (duplicateSocUsername.equals(person.getSocUsername().value)) {
-                throw new DuplicatePersonFieldException("SOC username", duplicateSocUsername);
-            }
         }
     }
 
