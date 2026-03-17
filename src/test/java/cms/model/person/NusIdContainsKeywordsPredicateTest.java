@@ -52,6 +52,10 @@ public class NusIdContainsKeywordsPredicateTest {
         // Mixed-case keyword
         predicate = new NusIdContainsKeywordsPredicate(Collections.singletonList("a0123456b"));
         assertTrue(predicate.test(new PersonBuilder().withNusId("A0123456B").build()));
+
+        // multiple keywords, match on second
+        predicate = new NusIdContainsKeywordsPredicate(Arrays.asList("A9999999Z", "A0123456B"));
+        assertTrue(predicate.test(new PersonBuilder().withNusId("A0123456B").build()));
     }
 
     @Test
@@ -77,5 +81,31 @@ public class NusIdContainsKeywordsPredicateTest {
 
         String expected = NusIdContainsKeywordsPredicate.class.getCanonicalName() + "{keywords=" + keywords + "}";
         assertEquals(expected, predicate.toString());
+    }
+
+    @Test
+    public void test_personWithNullNusId_returnsFalse() {
+        NusIdContainsKeywordsPredicate predicate =
+                new NusIdContainsKeywordsPredicate(Collections.singletonList("A0123456B"));
+
+        // Build a normal person and override getNusId() to return null to simulate missing NusId
+        Person base = new PersonBuilder().withNusId("A0123456B").build();
+        Person personWithNullNus = new Person(base.getName(), base.getPhone(), base.getEmail(), base.getNusId(),
+                base.getSocUsername(), base.getGithubUsername(), base.getRole(), base.getTutorialGroup(),
+                base.getTags()) {
+            @Override
+            public NusId getNusId() {
+                return null;
+            }
+        };
+
+        // Predicate should return false when person's NusId is null (short-circuited)
+        assertFalse(predicate.test(personWithNullNus));
+    }
+
+    @Test
+    public void test_keywordsNull_returnsFalse() {
+        NusIdContainsKeywordsPredicate predicate = new NusIdContainsKeywordsPredicate(null);
+        assertFalse(predicate.test(new PersonBuilder().withNusId("A0123456B").build()));
     }
 }
