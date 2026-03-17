@@ -10,6 +10,7 @@ import static cms.testutil.TypicalPersons.ALICE;
 import static cms.testutil.TypicalPersons.BOB;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
@@ -103,6 +104,35 @@ public class PersonTest {
         // different tags -> returns false
         editedAlice = new PersonBuilder(ALICE).withTags(VALID_TAG_HUSBAND).build();
         assertFalse(ALICE.equals(editedAlice));
+    }
+
+    @Test
+    public void findConflictingField() {
+        // null -> returns null
+        assertNull(ALICE.findConflictingField(null));
+
+        // same email -> returns email conflict
+        Person emailConflict = new PersonBuilder(BOB).withEmail(ALICE.getEmail().toString()).build();
+        FieldConflict emailFieldConflict = ALICE.findConflictingField(emailConflict);
+        assertEquals("email", emailFieldConflict.getFieldName());
+        assertEquals(ALICE.getEmail().toString(), emailFieldConflict.getFieldValue());
+
+        // same SOC username -> returns SOC username conflict
+        Person socUsernameConflict = new PersonBuilder(BOB).withSocUsername(ALICE.getSocUsername().toString()).build();
+        FieldConflict socFieldConflict = ALICE.findConflictingField(socUsernameConflict);
+        assertEquals("SOC username", socFieldConflict.getFieldName());
+        assertEquals(ALICE.getSocUsername().toString(), socFieldConflict.getFieldValue());
+
+        // same GitHub username -> returns GitHub username conflict
+        Person githubUsernameConflict = new PersonBuilder(BOB)
+                .withGithubUsername(ALICE.getGithubUsername().toString())
+                .build();
+        FieldConflict githubFieldConflict = ALICE.findConflictingField(githubUsernameConflict);
+        assertEquals("GitHub username", githubFieldConflict.getFieldName());
+        assertEquals(ALICE.getGithubUsername().toString(), githubFieldConflict.getFieldValue());
+
+        // no shared unique fields -> returns null
+        assertNull(ALICE.findConflictingField(BOB));
     }
 
     @Test
