@@ -14,7 +14,11 @@ Class UserPrefs
 
 Class UniquePersonList
 Class Person
-Class Address
+Class NusId
+Class SocUsername
+Class GithubUsername
+Class Role
+Class TutorialGroup
 Class Email
 Class Name
 Class Phone
@@ -40,7 +44,11 @@ UniquePersonList --> "~* all" Person
 Person *--> Name
 Person *--> Phone
 Person *--> Email
-Person *--> Address
+Person *--> NusId
+Person *--> SocUsername
+Person *--> GithubUsername
+Person *--> Role
+Person *--> TutorialGroup
 Person *--> "*" Tag
 
 Person -[hidden]up--> I
