@@ -104,6 +104,16 @@ public class NameOrNusIdContainsKeywordsPredicateTest {
     }
 
     @Test
+    public void equals_nameSameIdDifferent() {
+        NameOrNusIdContainsKeywordsPredicate p1 =
+                new NameOrNusIdContainsKeywordsPredicate(Arrays.asList("Alice"), Arrays.asList("A0123456B"));
+        NameOrNusIdContainsKeywordsPredicate p2 =
+                new NameOrNusIdContainsKeywordsPredicate(Arrays.asList("Alice"), Arrays.asList("A0123457B"));
+        // name lists equal (true) but id lists different (false) -> overall equals should be false
+        assertFalse(p1.equals(p2));
+    }
+
+    @Test
     public void test_personWithNullNusId_returnsFalse() {
         NameOrNusIdContainsKeywordsPredicate predicate = new NameOrNusIdContainsKeywordsPredicate(
                 Collections.emptyList(), Collections.singletonList("A0123456B"));
