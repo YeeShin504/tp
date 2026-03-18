@@ -80,6 +80,25 @@ public class FindCommandParserTest {
                 " a/john david n/tan lim id/a12345678b a0211111c",
                 expected);
     }
+
+    @Test
+    public void parse_withPreamble_throwsParseException() {
+        // any preamble text should cause failure
+        assertParseFailure(parser, "preamble a/john",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, FindCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parse_allPrefix_multipleWhitespaceSplits() {
+        // ensure multiple whitespace is handled when splitting keywords
+        FindCommand expected = new FindCommand(
+                new CombinedFindPredicate(
+                        new AllFieldsContainsKeywordsPredicate(
+                                Arrays.asList("john", "david")),
+                        new NameContainsKeywordsPredicate(Collections.emptyList()),
+                        new NusIdContainsKeywordsPredicate(Collections.emptyList())));
+        assertParseSuccess(parser, " a/  john   david  ", expected);
+    }
 }
 
 
