@@ -5,23 +5,24 @@ package cms.model.person;
  */
 public class FieldConflict {
     private final String fieldName;
-    private final String fieldValue;
+    private final Person person;
 
     /**
      * Constructs a FieldConflict with the specified field name and value.
-     * @param fieldName the name of the conflicting field (e.g. "email", "SOC username", "GitHub username")
-     * @param fieldValue the value of the conflicting field that appears in both persons
+     * @param otherPerson the person with the conflicting field
+     * @param fieldName   the name of the conflicting field (e.g. "email", "SOC
+     *                    username", "GitHub username")
      */
-    public FieldConflict(String fieldName, String fieldValue) {
+    public FieldConflict(Person otherPerson, String fieldName) {
         this.fieldName = fieldName;
-        this.fieldValue = fieldValue;
+        this.person = otherPerson;
     }
 
     public String getFieldName() {
         return fieldName;
     }
 
-    public String getFieldValue() {
-        return fieldValue;
+    public Person getPerson() {
+        return person;
     }
 }

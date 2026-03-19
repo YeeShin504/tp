@@ -35,7 +35,7 @@ public class PersonTest {
 
         // same NUS ID, all other attributes different -> returns true
         Person editedAlice = new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).withEmail(VALID_EMAIL_BOB)
-            .withTags(VALID_TAG_HUSBAND).withName(VALID_NAME_BOB).build();
+                .withTags(VALID_TAG_HUSBAND).withName(VALID_NAME_BOB).build();
         assertTrue(ALICE.isSamePerson(editedAlice));
 
         // different NUS ID, all other attributes same -> returns false
@@ -46,9 +46,8 @@ public class PersonTest {
         Person editedBob = new PersonBuilder(BOB).withName(VALID_NAME_BOB.toLowerCase()).build();
         assertTrue(BOB.isSamePerson(editedBob));
 
-        // name has trailing spaces, all other attributes same -> returns false
-        String nameWithTrailingSpaces = VALID_NAME_BOB + " ";
-        editedBob = new PersonBuilder(BOB).withName(nameWithTrailingSpaces).build();
+        // NUS ID has different value, all other attributes same -> returns false
+        editedBob = new PersonBuilder(BOB).withNusId("A1111111A").build();
         assertFalse(BOB.isSamePerson(editedBob));
     }
 

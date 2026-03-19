@@ -13,7 +13,7 @@ public class DuplicatePersonFieldException extends RuntimeException {
      * @param conflict the field conflict causing the exception
      */
     public DuplicatePersonFieldException(FieldConflict conflict) {
-        super(String.format("A person with %s [%s] already exists in the system.",
-                conflict.getFieldName(), conflict.getFieldValue()));
+        super(String.format("A person with the same [%s] already exists in the system.\n%1$s: %2$s",
+                conflict.getFieldName(), conflict.getPerson()));
     }
 }

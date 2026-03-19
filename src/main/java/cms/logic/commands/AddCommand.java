@@ -49,7 +49,7 @@ public class AddCommand extends Command {
 
     public static final String MESSAGE_SUCCESS = "New person added: %1$s";
     public static final String MESSAGE_DUPLICATE_PERSON = "This person already exists in the system";
-    public static final String MESSAGE_DUPLICATE_FIELDS = "A person with the same fields already exists in the system";
+    // public static final String MESSAGE_DUPLICATE_FIELDS = "A person with the same fields already exists in the system";
 
     private final Person toAdd;
 
@@ -65,16 +65,25 @@ public class AddCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        if (model.hasPerson(toAdd)) {
+        // if (model.hasPerson(toAdd)) {
+        //     throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+        // }
+
+        // if (model.hasPersonWithConflictingField(toAdd)) {
+        //     DuplicatePersonFieldException exception = model.getDuplicatePersonFieldException(toAdd);
+        //     throw new CommandException(MESSAGE_DUPLICATE_FIELDS, exception);
+        // }}
+
+        // model.addPerson(toAdd);
+        // return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
+        try {
+            model.addPerson(toAdd);
+            return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
+        } catch (cms.model.person.exceptions.DuplicatePersonException e) {
             throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+        } catch (cms.model.person.exceptions.DuplicatePersonFieldException e) {
+            throw new CommandException("", e);
         }
-
-        if (model.hasPersonWithConflictingField(toAdd)) {
-            throw new CommandException(MESSAGE_DUPLICATE_FIELDS);
-        }
-
-        model.addPerson(toAdd);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
     }
 
     @Override
