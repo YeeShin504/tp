@@ -186,7 +186,7 @@ Invalid edits can cause CMS to reset your data file on next launch. Back up `CMS
 
 --------------------------------------------------------------------------------------------------------------------
 
-**Fields and accepted formats**
+## Fields and accepted formats
 
 Use this section as a quick checklist for `add` and `edit`.
 
