@@ -116,12 +116,14 @@ public class PersonTest {
         FieldConflict emailFieldConflict = ALICE.findConflictingField(emailConflict);
         assertEquals("email", emailFieldConflict.getFieldName());
         assertEquals(ALICE.getEmail().toString(), emailFieldConflict.getFieldValue());
+        assertEquals(emailConflict, emailFieldConflict.getConflictingPerson());
 
         // same SOC username -> returns SOC username conflict
         Person socUsernameConflict = new PersonBuilder(BOB).withSocUsername(ALICE.getSocUsername().toString()).build();
         FieldConflict socFieldConflict = ALICE.findConflictingField(socUsernameConflict);
         assertEquals("SOC username", socFieldConflict.getFieldName());
         assertEquals(ALICE.getSocUsername().toString(), socFieldConflict.getFieldValue());
+        assertEquals(socUsernameConflict, socFieldConflict.getConflictingPerson());
 
         // same GitHub username -> returns GitHub username conflict
         Person githubUsernameConflict = new PersonBuilder(BOB)
@@ -130,6 +132,7 @@ public class PersonTest {
         FieldConflict githubFieldConflict = ALICE.findConflictingField(githubUsernameConflict);
         assertEquals("GitHub username", githubFieldConflict.getFieldName());
         assertEquals(ALICE.getGithubUsername().toString(), githubFieldConflict.getFieldValue());
+        assertEquals(githubUsernameConflict, githubFieldConflict.getConflictingPerson());
 
         // no shared unique fields -> returns null
         assertNull(ALICE.findConflictingField(BOB));

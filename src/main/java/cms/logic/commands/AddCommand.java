@@ -16,6 +16,8 @@ import cms.logic.Messages;
 import cms.logic.commands.exceptions.CommandException;
 import cms.model.Model;
 import cms.model.person.Person;
+import cms.model.person.exceptions.DuplicatePersonException;
+import cms.model.person.exceptions.DuplicatePersonFieldException;
 
 /**
  * Adds a person to the address book.
@@ -43,13 +45,13 @@ public class AddCommand extends Command {
             + PREFIX_GITHUBUSERNAME + "johndoe "
             + PREFIX_EMAIL + "johnd@example.com "
             + PREFIX_PHONE + "98765432 "
-            + PREFIX_TUTORIALGROUP + "TUTORIAL_GROUP "
+            + PREFIX_TUTORIALGROUP + "01 "
             + PREFIX_TAG + "struggling "
             + PREFIX_TAG + "python-experienced ";
 
     public static final String MESSAGE_SUCCESS = "New person added: %1$s";
     public static final String MESSAGE_DUPLICATE_PERSON = "This person already exists in the system";
-    // public static final String MESSAGE_DUPLICATE_FIELDS = "A person with the same fields already exists in the system";
+    public static final String MESSAGE_DUPLICATE_FIELDS = "A person with the same fields already exists in the system";
 
     private final Person toAdd;
 
@@ -65,25 +67,13 @@ public class AddCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        // if (model.hasPerson(toAdd)) {
-        //     throw new CommandException(MESSAGE_DUPLICATE_PERSON);
-        // }
-
-        // if (model.hasPersonWithConflictingField(toAdd)) {
-        //     DuplicatePersonFieldException exception = model.getDuplicatePersonFieldException(toAdd);
-        //     throw new CommandException(MESSAGE_DUPLICATE_FIELDS, exception);
-        // }}
-
-        // model.addPerson(toAdd);
-        // return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
         try {
             model.addPerson(toAdd);
-            return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
-        } catch (cms.model.person.exceptions.DuplicatePersonException e) {
-            throw new CommandException(MESSAGE_DUPLICATE_PERSON);
-        } catch (cms.model.person.exceptions.DuplicatePersonFieldException e) {
-            throw new CommandException("", e);
+        } catch (DuplicatePersonException | DuplicatePersonFieldException e) {
+            throw new CommandException(e.getMessage());
         }
+
+        return new CommandResult(String.format(MESSAGE_SUCCESS, Messages.format(toAdd)));
     }
 
     @Override

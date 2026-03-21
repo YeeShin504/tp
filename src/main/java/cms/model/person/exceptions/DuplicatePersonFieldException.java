@@ -1,5 +1,7 @@
 package cms.model.person.exceptions;
 
+import static java.util.Objects.requireNonNull;
+
 import cms.model.person.FieldConflict;
 
 /**
@@ -8,12 +10,24 @@ import cms.model.person.FieldConflict;
  */
 public class DuplicatePersonFieldException extends RuntimeException {
 
+    private static final String DETAILED_MESSAGE_TEMPLATE =
+            "A person with %s [%s] already exists in the system. Conflicting person: %s (%s).";
+
+    /**
+     * Builds the duplicate field message for the specified field conflict.
+     */
+    public static String buildMessage(FieldConflict conflict) {
+        requireNonNull(conflict);
+        return String.format(DETAILED_MESSAGE_TEMPLATE,
+                conflict.getFieldName(), conflict.getFieldValue(),
+                conflict.getConflictingPerson().getName(), conflict.getConflictingPerson().getNusId());
+    }
+
     /**
      * Constructs a DuplicatePersonFieldException for the given field conflict.
      * @param conflict the field conflict causing the exception
      */
     public DuplicatePersonFieldException(FieldConflict conflict) {
-        super(String.format("A person with the same [%s] already exists in the system.\n%1$s: %2$s",
-                conflict.getFieldName(), conflict.getPerson()));
+        super(buildMessage(conflict));
     }
 }
