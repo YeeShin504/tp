@@ -230,8 +230,10 @@ public class UniquePersonListTest {
 
     @Test
     public void sortByTutorialGroup_numericTutorialGroups_sortsByGroupNumber() {
-        Person firstPerson = new PersonBuilder(ALICE).build();
-        Person secondPerson = new PersonBuilder(BOB).build();
+        Person firstPerson = createSortTestPerson("Alice Sort", "A1234567B", "alice-sort@test.com",
+                "asort1", "alice-sort-gh");
+        Person secondPerson = createSortTestPerson("Bob Sort", "A1234568C", "bob-sort@test.com",
+                "bsort1", "bob-sort-gh");
         uniquePersonList.add(firstPerson);
         uniquePersonList.add(secondPerson);
 
@@ -245,8 +247,10 @@ public class UniquePersonListTest {
 
     @Test
     public void sortByTutorialGroup_unparseableTutorialGroups_fallsBackToStringComparison() {
-        Person firstPerson = new PersonBuilder(ALICE).build();
-        Person secondPerson = new PersonBuilder(BOB).build();
+        Person firstPerson = createSortTestPerson("Fallback Alpha", "A1234569D", "fallback-a@test.com",
+                "falpha", "fallback-a-gh");
+        Person secondPerson = createSortTestPerson("Fallback Beta", "A1234570E", "fallback-b@test.com",
+                "fbeta1", "fallback-b-gh");
         uniquePersonList.add(firstPerson);
         uniquePersonList.add(secondPerson);
 
@@ -260,8 +264,10 @@ public class UniquePersonListTest {
 
     @Test
     public void sort_resortsListByTutorialGroup() {
-        Person firstPerson = new PersonBuilder(ALICE).build();
-        Person secondPerson = new PersonBuilder(BOB).build();
+        Person firstPerson = createSortTestPerson("Sort Wrapper Alpha", "A1234571F", "sort-wrapper-a@test.com",
+                "swrap1", "sort-wrapper-a-gh");
+        Person secondPerson = createSortTestPerson("Sort Wrapper Beta", "A1234572G", "sort-wrapper-b@test.com",
+                "swrap2", "sort-wrapper-b-gh");
         uniquePersonList.add(firstPerson);
         uniquePersonList.add(secondPerson);
 
@@ -292,5 +298,16 @@ public class UniquePersonListTest {
         } catch (ReflectiveOperationException e) {
             throw new AssertionError("Unable to set tutorial group value for test setup", e);
         }
+    }
+
+    private static Person createSortTestPerson(String name, String nusId, String email,
+                                               String socUsername, String githubUsername) {
+        return new PersonBuilder()
+                .withName(name)
+                .withNusId(nusId)
+                .withEmail(email)
+                .withSocUsername(socUsername)
+                .withGithubUsername(githubUsername)
+                .build();
     }
 }
