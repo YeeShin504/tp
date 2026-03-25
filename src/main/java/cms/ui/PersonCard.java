@@ -70,7 +70,7 @@ public class PersonCard extends UiPart<Region> {
                 ? MaskingUtil.maskGithubUsername(person.getGithubUsername())
                 : person.getGithubUsername().value);
         role.setText(person.getRole().value);
-        tutorialGroup.setText(person.getTutorialGroup().value);
+        tutorialGroup.setText(String.valueOf(person.getTutorialGroup().value));
         person.getTags().stream()
                 .sorted(Comparator.comparing(tag -> tag.tagName))
                 .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
