@@ -3,6 +3,8 @@ package cms.commons.util;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.lang.reflect.Method;
+
 import org.junit.jupiter.api.Test;
 
 import cms.model.person.Email;
@@ -46,5 +48,16 @@ public class MaskingUtilTest {
         assertEquals("********", MaskingUtil.maskGithubUsername(new GithubUsername("abc")));
         assertEquals("********", MaskingUtil.maskGithubUsername(new GithubUsername("abcdefg")));
         assertEquals("********", MaskingUtil.maskGithubUsername(new GithubUsername("ab")));
+    }
+
+    @Test
+    public void privateGuards_phoneEmptyAndInvalidEmail() throws Exception {
+        Method maskPhoneValue = MaskingUtil.class.getDeclaredMethod("maskPhoneValue", String.class);
+        maskPhoneValue.setAccessible(true);
+        assertEquals("", (String) maskPhoneValue.invoke(null, ""));
+
+        Method maskEmailValue = MaskingUtil.class.getDeclaredMethod("maskEmailValue", String.class);
+        maskEmailValue.setAccessible(true);
+        assertEquals("********", (String) maskEmailValue.invoke(null, "abc@"));
     }
 }
