@@ -16,7 +16,6 @@ import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.logic.commands.exceptions.CommandException;
 import cms.logic.parser.AddressBookParser;
 import cms.logic.parser.exceptions.ParseException;
-import cms.model.AddressBook;
 import cms.model.Model;
 import cms.model.ReadOnlyAddressBook;
 import cms.model.person.Person;
