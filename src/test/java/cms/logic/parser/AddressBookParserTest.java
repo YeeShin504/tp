@@ -24,6 +24,7 @@ import cms.logic.commands.ExportCommand;
 import cms.logic.commands.FindCommand;
 import cms.logic.commands.HelpCommand;
 import cms.logic.commands.ImportCommand;
+import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.logic.commands.ListCommand;
 import cms.logic.parser.exceptions.ParseException;
 import cms.model.person.AllFieldsContainsKeywordsPredicate;
@@ -91,6 +92,14 @@ public class AddressBookParserTest {
         String path = "data/import.json";
         ImportCommand command = (ImportCommand) parser.parseCommand(ImportCommand.COMMAND_WORD + " " + path);
         assertEquals(new ImportCommand(java.nio.file.Path.of(path)), command);
+
+        ImportCommand keepIncomingCommand = (ImportCommand) parser.parseCommand(
+                ImportCommand.COMMAND_WORD + " " + path + " keep/incoming");
+        assertEquals(new ImportCommand(java.nio.file.Path.of(path), KeepPolicy.INCOMING), keepIncomingCommand);
+
+        ImportCommand keepCurrentCommand = (ImportCommand) parser.parseCommand(
+                ImportCommand.COMMAND_WORD + " " + path + " keep/current");
+        assertEquals(new ImportCommand(java.nio.file.Path.of(path), KeepPolicy.CURRENT), keepCurrentCommand);
 
         String quotedPathWithWhitespace = "C:/Users/Josh/My Documents/import.json";
         ImportCommand commandQuoted = (ImportCommand) parser.parseCommand(

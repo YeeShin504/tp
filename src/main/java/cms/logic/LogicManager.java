@@ -12,9 +12,11 @@ import cms.logic.commands.Command;
 import cms.logic.commands.CommandResult;
 import cms.logic.commands.ExportCommand;
 import cms.logic.commands.ImportCommand;
+import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.logic.commands.exceptions.CommandException;
 import cms.logic.parser.AddressBookParser;
 import cms.logic.parser.exceptions.ParseException;
+import cms.model.AddressBook;
 import cms.model.Model;
 import cms.model.ReadOnlyAddressBook;
 import cms.model.person.Person;
@@ -34,6 +36,9 @@ public class LogicManager implements Logic {
 
     public static final String FILE_OPS_EXPORT_PERMISSION_ERROR_FORMAT =
         "Could not export data to file %s due to insufficient permissions to write to the file or the folder.";
+    public static final String IMPORT_KEEP_REQUIRED_NON_EMPTY = "Current data is non-empty. "
+            + "Re-run with keep/incoming to replace current data, "
+            + "or keep/current to keep current data.";
 
     private final Logger logger = LogsCenter.getLogger(LogicManager.class);
 
@@ -58,6 +63,11 @@ public class LogicManager implements Logic {
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
 
+        if (command instanceof ImportCommand) {
+            String importFeedback = handleImportCommand((ImportCommand) command);
+            commandResult = new CommandResult(importFeedback);
+        }
+
         try {
             storage.saveAddressBook(model.getAddressBook());
         } catch (AccessDeniedException e) {
@@ -78,20 +88,34 @@ public class LogicManager implements Logic {
             }
         }
 
-        if (command instanceof ImportCommand) {
-            Path importFilePath = ((ImportCommand) command).getImportFilePath();
-            try {
-                ReadOnlyAddressBook importedAddressBook = storage.readAddressBook(importFilePath)
-                        .orElseThrow(() -> new CommandException(
-                                "Import file is empty or not a valid address book data file."));
-                model.setAddressBook(importedAddressBook);
-                model.updateFilteredPersonList(model.PREDICATE_SHOW_ALL_PERSONS);
-            } catch (DataLoadingException dle) {
-                throw new CommandException("Import file contains invalid address book data.", dle);
-            }
+        return commandResult;
+    }
+
+    private String handleImportCommand(ImportCommand importCommand) throws CommandException {
+        Path importFilePath = importCommand.getImportFilePath();
+        ReadOnlyAddressBook importedAddressBook;
+        try {
+            importedAddressBook = storage.readAddressBook(importFilePath)
+                    .orElseThrow(() -> new CommandException(
+                            "Import file is empty or not a valid address book data file."));
+        } catch (DataLoadingException dle) {
+            throw new CommandException("Import file contains invalid address book data.", dle);
         }
 
-        return commandResult;
+        boolean hasCurrentData = !model.getAddressBook().getPersonList().isEmpty();
+        KeepPolicy keepPolicy = importCommand.getKeepPolicy();
+        if (hasCurrentData && keepPolicy == null) {
+            throw new CommandException(IMPORT_KEEP_REQUIRED_NON_EMPTY);
+        }
+
+        if (!hasCurrentData || keepPolicy == KeepPolicy.INCOMING) {
+            model.setAddressBook(importedAddressBook);
+            model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+            return String.format(ImportCommand.MESSAGE_SUCCESS, importFilePath);
+        }
+
+        model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+        return String.format(ImportCommand.MESSAGE_KEEP_CURRENT_SUCCESS, importFilePath);
     }
 
     @Override

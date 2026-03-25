@@ -1,11 +1,13 @@
 package cms.logic.parser;
 
 import static cms.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+import static cms.logic.parser.CliSyntax.PREFIX_KEEP;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import cms.logic.commands.ImportCommand;
+import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.logic.parser.exceptions.ParseException;
 
 /**
@@ -17,15 +19,20 @@ public class ImportCommandParser implements Parser<ImportCommand> {
         + "Format: " + ImportCommand.MESSAGE_USAGE;
     public static final String MESSAGE_FILE_EXTENSION_REQUIRED = "File path must end with .json\n"
         + "Format: " + ImportCommand.MESSAGE_USAGE;
+    public static final String MESSAGE_INVALID_KEEP = "keep/ must be either 'current' or 'incoming'.\n"
+            + "Format: " + ImportCommand.MESSAGE_USAGE;
 
     @Override
     public ImportCommand parse(String args) throws ParseException {
-        String trimmedArgs = args.trim();
-        if (trimmedArgs.isEmpty()) {
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_KEEP);
+        argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_KEEP);
+
+        String trimmedPath = argMultimap.getPreamble().trim();
+        if (trimmedPath.isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, ImportCommand.MESSAGE_USAGE));
         }
 
-        String pathString = removeMatchingSurroundingQuotes(trimmedArgs);
+        String pathString = removeMatchingSurroundingQuotes(trimmedPath);
         if (pathString == null) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, ImportCommand.MESSAGE_USAGE));
         }
@@ -41,7 +48,23 @@ public class ImportCommandParser implements Parser<ImportCommand> {
             throw new ParseException(MESSAGE_FILE_EXTENSION_REQUIRED);
         }
 
-        return new ImportCommand(importFilePath);
+        KeepPolicy keepPolicy = parseKeepPolicy(argMultimap.getValue(PREFIX_KEEP).orElse(null));
+        return new ImportCommand(importFilePath, keepPolicy);
+    }
+
+    private KeepPolicy parseKeepPolicy(String keepValue) throws ParseException {
+        if (keepValue == null) {
+            return null;
+        }
+
+        String normalizedKeepValue = keepValue.trim().toLowerCase();
+        if (normalizedKeepValue.equals("current")) {
+            return KeepPolicy.CURRENT;
+        }
+        if (normalizedKeepValue.equals("incoming")) {
+            return KeepPolicy.INCOMING;
+        }
+        throw new ParseException(MESSAGE_INVALID_KEEP);
     }
 
     private String removeMatchingSurroundingQuotes(String input) {

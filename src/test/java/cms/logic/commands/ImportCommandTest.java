@@ -8,6 +8,7 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
+import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.model.Model;
 import cms.model.ModelManager;
 import cms.model.UserPrefs;
@@ -28,13 +29,19 @@ public class ImportCommandTest {
 
     @Test
     public void equals() {
-        ImportCommand importFirstCommand = new ImportCommand(Path.of("data/first.json"));
-        ImportCommand importFirstCommandCopy = new ImportCommand(Path.of("data/first.json"));
-        ImportCommand importSecondCommand = new ImportCommand(Path.of("data/second.json"));
+        ImportCommand importFirstCommand = new ImportCommand(Path.of("data/first.json"),
+                KeepPolicy.CURRENT);
+        ImportCommand importFirstCommandCopy = new ImportCommand(Path.of("data/first.json"),
+                KeepPolicy.CURRENT);
+        ImportCommand importSecondCommand = new ImportCommand(Path.of("data/second.json"),
+                KeepPolicy.CURRENT);
+        ImportCommand importDifferentMode = new ImportCommand(Path.of("data/first.json"),
+                KeepPolicy.INCOMING);
 
         assertTrue(importFirstCommand.equals(importFirstCommand));
         assertTrue(importFirstCommand.equals(importFirstCommandCopy));
         assertFalse(importFirstCommand.equals(importSecondCommand));
+        assertFalse(importFirstCommand.equals(importDifferentMode));
         assertFalse(importFirstCommand.equals(1));
         assertFalse(importFirstCommand.equals(null));
     }

@@ -203,6 +203,80 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void execute_importCommandWithCurrentDataAndNoKeep_throwsCommandException() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + NAME_DESC_AMY + NUSID_DESC_AMY + ROLE_DESC_AMY
+                + SOCUSERNAME_DESC_AMY + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY
+                + EMAIL_DESC_AMY + TUTORIALGROUP_DESC_AMY);
+        Person expectedCurrentPerson = new PersonBuilder(AMY).withTags().build();
+
+        Path importPath = createImportFileWithSinglePerson(new PersonBuilder()
+                .withName("Bob Person")
+                .withNusId("A0000002C")
+                .withSocUsername("bobsoc")
+                .withGithubUsername("bobgit")
+                .withEmail("bob@example.com")
+                .withPhone("91234567")
+                .withTutorialGroup("T02")
+                .build());
+
+        String importCommand = ImportCommand.COMMAND_WORD + " \"" + importPath + "\"";
+        assertCommandFailure(importCommand, CommandException.class, LogicManager.IMPORT_KEEP_REQUIRED_NON_EMPTY);
+        assertEquals(1, model.getFilteredPersonList().size());
+        assertEquals(expectedCurrentPerson, model.getFilteredPersonList().get(0));
+    }
+
+    @Test
+    public void execute_importCommandKeepCurrent_keepsExistingData() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + NAME_DESC_AMY + NUSID_DESC_AMY + ROLE_DESC_AMY
+                + SOCUSERNAME_DESC_AMY + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY
+                + EMAIL_DESC_AMY + TUTORIALGROUP_DESC_AMY);
+        Person expectedCurrentPerson = new PersonBuilder(AMY).withTags().build();
+
+        Person incomingPerson = new PersonBuilder()
+                .withName("Bob Person")
+                .withNusId("A0000002C")
+                .withSocUsername("bobsoc")
+                .withGithubUsername("bobgit")
+                .withEmail("bob@example.com")
+                .withPhone("91234567")
+                .withTutorialGroup("T02")
+                .build();
+        Path importPath = createImportFileWithSinglePerson(incomingPerson);
+
+        String importCommand = ImportCommand.COMMAND_WORD + " \"" + importPath + "\" keep/current";
+        CommandResult result = logic.execute(importCommand);
+
+        assertEquals(String.format(ImportCommand.MESSAGE_KEEP_CURRENT_SUCCESS, importPath), result.getFeedbackToUser());
+        assertEquals(1, model.getFilteredPersonList().size());
+        assertEquals(expectedCurrentPerson, model.getFilteredPersonList().get(0));
+    }
+
+    @Test
+    public void execute_importCommandKeepIncoming_replacesExistingData() throws Exception {
+        logic.execute(AddCommand.COMMAND_WORD + NAME_DESC_AMY + NUSID_DESC_AMY + ROLE_DESC_AMY
+                + SOCUSERNAME_DESC_AMY + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY
+                + EMAIL_DESC_AMY + TUTORIALGROUP_DESC_AMY);
+
+        Person incomingPerson = new PersonBuilder()
+                .withName("Bob Person")
+                .withNusId("A0000002C")
+                .withSocUsername("bobsoc")
+                .withGithubUsername("bobgit")
+                .withEmail("bob@example.com")
+                .withPhone("91234567")
+                .withTutorialGroup("T02")
+                .build();
+        Path importPath = createImportFileWithSinglePerson(incomingPerson);
+
+        String importCommand = ImportCommand.COMMAND_WORD + " \"" + importPath + "\" keep/incoming";
+        CommandResult result = logic.execute(importCommand);
+
+        assertEquals(String.format(ImportCommand.MESSAGE_SUCCESS, importPath), result.getFeedbackToUser());
+        assertEquals(1, model.getFilteredPersonList().size());
+        assertEquals(incomingPerson, model.getFilteredPersonList().get(0));
+    }
+
+    @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredPersonList().remove(0));
     }
@@ -297,5 +371,14 @@ public class LogicManagerTest {
         ModelManager expectedModel = new ModelManager();
         expectedModel.addPerson(expectedPerson);
         assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
+    }
+
+    private Path createImportFileWithSinglePerson(Person person) throws IOException {
+        AddressBook incomingAddressBook = new AddressBook();
+        incomingAddressBook.addPerson(person);
+
+        Path importPath = temporaryFolder.resolve("imports").resolve(person.getNusId() + ".json");
+        new JsonAddressBookStorage(importPath).saveAddressBook(incomingAddressBook, importPath);
+        return importPath;
     }
 }
