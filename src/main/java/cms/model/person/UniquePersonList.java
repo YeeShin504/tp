@@ -3,7 +3,6 @@ package cms.model.person;
 import static cms.commons.util.CollectionUtil.requireAllNonNull;
 import static java.util.Objects.requireNonNull;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -62,8 +61,6 @@ public class UniquePersonList implements Iterable<Person> {
         }
         ensureNoFieldConflict(toAdd, null);
         internalList.add(toAdd);
-        // keep list sorted by tutorial group after adding
-        sortByTutorialGroup();
     }
 
     /**
@@ -86,8 +83,6 @@ public class UniquePersonList implements Iterable<Person> {
 
         ensureNoFieldConflict(editedPerson, target);
         internalList.set(index, editedPerson);
-        // keep list sorted by tutorial group after editing
-        sortByTutorialGroup();
     }
 
     /**
@@ -104,8 +99,6 @@ public class UniquePersonList implements Iterable<Person> {
     public void setPersons(UniquePersonList replacement) {
         requireNonNull(replacement);
         internalList.setAll(replacement.internalList);
-        // maintain sorted order after replacing
-        sortByTutorialGroup();
     }
 
     /**
@@ -117,34 +110,16 @@ public class UniquePersonList implements Iterable<Person> {
         ensurePersonsAreUnique(persons);
 
         internalList.setAll(persons);
-        // maintain sorted order after replacing
-        sortByTutorialGroup();
     }
 
     /**
      * Sorts the internal list by tutorial group number in ascending order.
-     * TutorialGroup values are in the format "Txx" where xx is 01..99.
+     * TutorialGroup values are in the format "Txx" where xx is 01..99, so
+     * lexicographical ordering matches numeric ordering.
      */
     public void sortByTutorialGroup() {
-        Comparator<Person> comparator = (p1, p2) -> {
-            try {
-                int t1 = Integer.parseInt(p1.getTutorialGroup().value.substring(1));
-                int t2 = Integer.parseInt(p2.getTutorialGroup().value.substring(1));
-                return Integer.compare(t1, t2);
-            } catch (Exception e) {
-                // fallback to string compare if parsing fails
-                return p1.getTutorialGroup().value.compareTo(p2.getTutorialGroup().value);
-            }
-        };
-
-        FXCollections.sort(internalList, comparator);
-    }
-
-    /**
-     * Public alias to allow callers outside this class to request sorting.
-     */
-    public void sort() {
-        sortByTutorialGroup();
+        FXCollections.sort(internalList, (first, second) ->
+                first.getTutorialGroup().value.compareTo(second.getTutorialGroup().value));
     }
 
     /**

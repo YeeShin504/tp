@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -76,6 +75,20 @@ public class UniquePersonListTest {
     }
 
     @Test
+    public void add_personsRemainInInsertionOrderUntilExplicitSort() {
+        Person tutorialGroupTen = createSortTestPerson("Alice Sort", "A1234567B", "alice-sort@test.com",
+                "asort1", "alice-sort-gh", "T10");
+        Person tutorialGroupTwo = createSortTestPerson("Bob Sort", "A1234568C", "bob-sort@test.com",
+                "bsort1", "bob-sort-gh", "T02");
+
+        uniquePersonList.add(tutorialGroupTen);
+        uniquePersonList.add(tutorialGroupTwo);
+
+        assertEquals(Arrays.asList(tutorialGroupTen, tutorialGroupTwo),
+                uniquePersonList.asUnmodifiableObservableList());
+    }
+
+    @Test
     public void add_personWithConflictingEmail_throwsDuplicatePersonFieldException() {
         uniquePersonList.add(ALICE);
         Person editedAlice = new PersonBuilder(ALICE).withNusId("A1234567C").build();
@@ -126,6 +139,24 @@ public class UniquePersonListTest {
         UniquePersonList expectedUniquePersonList = new UniquePersonList();
         expectedUniquePersonList.add(BOB);
         assertEquals(expectedUniquePersonList, uniquePersonList);
+    }
+
+    @Test
+    public void setPerson_editedPersonDoesNotTriggerAutomaticSort() {
+        Person tutorialGroupTen = createSortTestPerson("Set Sort Alpha", "A1234571F", "set-sort-a@test.com",
+                "ssort1", "set-sort-a-gh", "T10");
+        Person tutorialGroupTwo = createSortTestPerson("Set Sort Beta", "A1234572G", "set-sort-b@test.com",
+                "ssort2", "set-sort-b-gh", "T02");
+        Person editedTutorialGroupTen = new PersonBuilder(tutorialGroupTen)
+                .withName("Set Sort Alpha Edited")
+                .build();
+
+        uniquePersonList.add(tutorialGroupTen);
+        uniquePersonList.add(tutorialGroupTwo);
+        uniquePersonList.setPerson(tutorialGroupTen, editedTutorialGroupTen);
+
+        assertEquals(Arrays.asList(editedTutorialGroupTen, tutorialGroupTwo),
+                uniquePersonList.asUnmodifiableObservableList());
     }
 
     @Test
@@ -229,54 +260,31 @@ public class UniquePersonListTest {
     }
 
     @Test
-    public void sortByTutorialGroup_numericTutorialGroups_sortsByGroupNumber() {
-        Person firstPerson = createSortTestPerson("Alice Sort", "A1234567B", "alice-sort@test.com",
-                "asort1", "alice-sort-gh");
-        Person secondPerson = createSortTestPerson("Bob Sort", "A1234568C", "bob-sort@test.com",
-                "bsort1", "bob-sort-gh");
-        uniquePersonList.add(firstPerson);
-        uniquePersonList.add(secondPerson);
+    public void setPersons_listPreservesProvidedOrderUntilExplicitSort() {
+        Person tutorialGroupTen = createSortTestPerson("List Sort Alpha", "A1234573H", "list-sort-a@test.com",
+                "lsort1", "list-sort-a-gh", "T10");
+        Person tutorialGroupTwo = createSortTestPerson("List Sort Beta", "A1234574I", "list-sort-b@test.com",
+                "lsort2", "list-sort-b-gh", "T02");
 
-        setTutorialGroupValue(firstPerson, "T10");
-        setTutorialGroupValue(secondPerson, "T02");
+        uniquePersonList.setPersons(Arrays.asList(tutorialGroupTen, tutorialGroupTwo));
 
-        uniquePersonList.sortByTutorialGroup();
-
-        assertEquals(Arrays.asList(secondPerson, firstPerson), uniquePersonList.asUnmodifiableObservableList());
+        assertEquals(Arrays.asList(tutorialGroupTen, tutorialGroupTwo),
+                uniquePersonList.asUnmodifiableObservableList());
     }
 
     @Test
-    public void sortByTutorialGroup_unparseableTutorialGroups_fallsBackToStringComparison() {
-        Person firstPerson = createSortTestPerson("Fallback Alpha", "A1234569D", "fallback-a@test.com",
-                "falpha", "fallback-a-gh");
-        Person secondPerson = createSortTestPerson("Fallback Beta", "A1234570E", "fallback-b@test.com",
-                "fbeta1", "fallback-b-gh");
-        uniquePersonList.add(firstPerson);
-        uniquePersonList.add(secondPerson);
+    public void sortByTutorialGroup_validTutorialGroups_sortsByGroupNumber() {
+        Person tutorialGroupTen = createSortTestPerson("Sort Wrapper Alpha", "A1234575J", "sort-wrapper-a@test.com",
+                "swrap1", "sort-wrapper-a-gh", "T10");
+        Person tutorialGroupTwo = createSortTestPerson("Sort Wrapper Beta", "A1234576K", "sort-wrapper-b@test.com",
+                "swrap2", "sort-wrapper-b-gh", "T02");
 
-        setTutorialGroupValue(firstPerson, "TA");
-        setTutorialGroupValue(secondPerson, "T9");
-
+        uniquePersonList.add(tutorialGroupTen);
+        uniquePersonList.add(tutorialGroupTwo);
         uniquePersonList.sortByTutorialGroup();
 
-        assertEquals(Arrays.asList(secondPerson, firstPerson), uniquePersonList.asUnmodifiableObservableList());
-    }
-
-    @Test
-    public void sort_resortsListByTutorialGroup() {
-        Person firstPerson = createSortTestPerson("Sort Wrapper Alpha", "A1234571F", "sort-wrapper-a@test.com",
-                "swrap1", "sort-wrapper-a-gh");
-        Person secondPerson = createSortTestPerson("Sort Wrapper Beta", "A1234572G", "sort-wrapper-b@test.com",
-                "swrap2", "sort-wrapper-b-gh");
-        uniquePersonList.add(firstPerson);
-        uniquePersonList.add(secondPerson);
-
-        setTutorialGroupValue(firstPerson, "T10");
-        setTutorialGroupValue(secondPerson, "T02");
-
-        uniquePersonList.sort();
-
-        assertEquals(Arrays.asList(secondPerson, firstPerson), uniquePersonList.asUnmodifiableObservableList());
+        assertEquals(Arrays.asList(tutorialGroupTwo, tutorialGroupTen),
+                uniquePersonList.asUnmodifiableObservableList());
     }
 
     @Test
@@ -290,24 +298,16 @@ public class UniquePersonListTest {
         assertEquals(uniquePersonList.asUnmodifiableObservableList().toString(), uniquePersonList.toString());
     }
 
-    private static void setTutorialGroupValue(Person person, String tutorialGroupValue) {
-        try {
-            Field tutorialGroupValueField = TutorialGroup.class.getDeclaredField("value");
-            tutorialGroupValueField.setAccessible(true);
-            tutorialGroupValueField.set(person.getTutorialGroup(), tutorialGroupValue);
-        } catch (ReflectiveOperationException e) {
-            throw new AssertionError("Unable to set tutorial group value for test setup", e);
-        }
-    }
-
     private static Person createSortTestPerson(String name, String nusId, String email,
-                                               String socUsername, String githubUsername) {
+                                               String socUsername, String githubUsername,
+                                               String tutorialGroup) {
         return new PersonBuilder()
                 .withName(name)
                 .withNusId(nusId)
                 .withEmail(email)
                 .withSocUsername(socUsername)
                 .withGithubUsername(githubUsername)
+                .withTutorialGroup(tutorialGroup)
                 .build();
     }
 }

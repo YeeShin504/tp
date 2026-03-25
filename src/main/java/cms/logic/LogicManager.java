@@ -50,9 +50,6 @@ public class LogicManager implements Logic {
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
 
-        // ensure the person list is sorted by tutorial group after every command
-        model.sortPersonsByTutorialGroup();
-
         try {
             storage.saveAddressBook(model.getAddressBook());
         } catch (AccessDeniedException e) {
