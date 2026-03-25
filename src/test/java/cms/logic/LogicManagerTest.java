@@ -51,7 +51,7 @@ public class LogicManagerTest {
     @TempDir
     public Path temporaryFolder;
 
-    private Model model = new ModelManager();
+    private final Model model = new ModelManager();
     private Logic logic;
 
     @BeforeEach
@@ -66,13 +66,13 @@ public class LogicManagerTest {
     @Test
     public void execute_invalidCommandFormat_throwsParseException() {
         String invalidCommand = "uicfhmowqewca";
-        assertParseException(invalidCommand, MESSAGE_UNKNOWN_COMMAND);
+        assertParseException(invalidCommand);
     }
 
     @Test
     public void execute_commandExecutionError_throwsCommandException() {
         String deleteCommand = "delete 9";
-        assertCommandException(deleteCommand, MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+        assertCommandException(deleteCommand);
     }
 
     @Test
@@ -162,7 +162,7 @@ public class LogicManagerTest {
 
         JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(prefPath) {
             @Override
-            public Optional<ReadOnlyAddressBook> readAddressBook(Path filePath) throws DataLoadingException {
+            public Optional<ReadOnlyAddressBook> readAddressBook(Path filePath) {
                 return Optional.empty();
             }
         };
@@ -302,8 +302,8 @@ public class LogicManagerTest {
      *
      * @see #assertCommandFailure(String, Class, String, Model)
      */
-    private void assertParseException(String inputCommand, String expectedMessage) {
-        assertCommandFailure(inputCommand, ParseException.class, expectedMessage);
+    private void assertParseException(String inputCommand) {
+        assertCommandFailure(inputCommand, ParseException.class, MESSAGE_UNKNOWN_COMMAND);
     }
 
     /**
@@ -311,8 +311,8 @@ public class LogicManagerTest {
      *
      * @see #assertCommandFailure(String, Class, String, Model)
      */
-    private void assertCommandException(String inputCommand, String expectedMessage) {
-        assertCommandFailure(inputCommand, CommandException.class, expectedMessage);
+    private void assertCommandException(String inputCommand) {
+        assertCommandFailure(inputCommand, CommandException.class, MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
     }
 
     /**
