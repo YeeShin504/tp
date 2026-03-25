@@ -2,39 +2,32 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.text.TextFlow?>
 
 <HBox id="cardPane" fx:id="cardPane" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
-    <GridPane HBox.hgrow="ALWAYS">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="150"/>
-        </columnConstraints>
-        <VBox alignment="CENTER_LEFT" minHeight="105" GridPane.columnIndex="0">
-            <padding>
-                <Insets top="5" right="5" bottom="5" left="15"/>
-            </padding>
-            <HBox spacing="0.5" alignment="CENTER_LEFT">
-                <Label fx:id="id" styleClass="cell_big_label">
-                    <minWidth>
-                        <!-- Ensures that the label text is never truncated -->
-                        <Region fx:constant="USE_PREF_SIZE"/>
-                    </minWidth>
-                </Label>
-                <Label fx:id="name" text="\$first" styleClass="cell_big_label"/>
-            </HBox>
-            <FlowPane fx:id="tags"/>
-            <Label fx:id="phone" styleClass="cell_small_label" text="\$phone"/>
-            <Label fx:id="email" styleClass="cell_small_label" text="\$email"/>
-            <Label fx:id="nusId" styleClass="cell_small_label" text="\$nusId"/>
-            <Label fx:id="socUsername" styleClass="cell_small_label" text="\$socUsername"/>
-            <Label fx:id="githubUsername" styleClass="cell_small_label" text="\$githubUsername"/>
-            <Label fx:id="role" styleClass="cell_small_label" text="\$role"/>
-            <Label fx:id="tutorialGroup" styleClass="cell_small_label" text="\$tutorialGroup"/>
-        </VBox>
-    </GridPane>
+    <VBox alignment="CENTER_LEFT" minHeight="72" spacing="8" HBox.hgrow="ALWAYS" styleClass="person-card">
+        <padding>
+            <Insets top="12" right="12" bottom="12" left="10"/>
+        </padding>
+        <HBox alignment="TOP_LEFT" spacing="7">
+            <Label fx:id="id" styleClass="card-index">
+                <minWidth>
+                    <Region fx:constant="USE_PREF_SIZE"/>
+                </minWidth>
+            </Label>
+            <VBox alignment="CENTER_LEFT" spacing="4" HBox.hgrow="ALWAYS">
+                <Label fx:id="name" text="\$first" styleClass="card-name"/>
+                <TextFlow>
+                    <Text styleClass="card-secondary-label" text="NUS ID: "/>
+                    <Text fx:id="nusIdValue" styleClass="card-secondary" text="\$nusId"/>
+                </TextFlow>
+            </VBox>
+            <Label fx:id="role" styleClass="card-role-badge" text="\$role"/>
+            <Label fx:id="tutorialGroup" styleClass="card-tutorial-badge" text="\$tutorialGroup"/>
+        </HBox>
+    </VBox>
 </HBox>

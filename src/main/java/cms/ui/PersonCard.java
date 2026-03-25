@@ -1,13 +1,11 @@
 package cms.ui;
 
-import java.util.Comparator;
-
 import cms.model.person.Person;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 
 /**
  * An UI component that displays information of a {@code Person}.
@@ -33,23 +31,11 @@ public class PersonCard extends UiPart<Region> {
     @FXML
     private Label id;
     @FXML
-    private Label phone;
-    @FXML
-    private Label nusId;
-    @FXML
-    private Label socUsername;
-    @FXML
-    private Label githubUsername;
-    @FXML
-    private Label address;
-    @FXML
-    private Label email;
-    @FXML
     private Label role;
     @FXML
     private Label tutorialGroup;
     @FXML
-    private FlowPane tags;
+    private Text nusIdValue;
 
     /**
      * Creates a {@code PersonCode} with the given {@code Person} and index to display.
@@ -59,15 +45,8 @@ public class PersonCard extends UiPart<Region> {
         this.person = person;
         id.setText(displayedIndex + ". ");
         name.setText(person.getName().fullName);
-        phone.setText(person.getPhone().value);
-        email.setText(person.getEmail().value);
-        nusId.setText(person.getNusId().value);
-        socUsername.setText(person.getSocUsername().value);
-        githubUsername.setText(person.getGithubUsername().value);
-        role.setText(person.getRole().value);
+        role.setText(person.getRole().value.toUpperCase());
         tutorialGroup.setText(person.getTutorialGroup().value);
-        person.getTags().stream()
-                .sorted(Comparator.comparing(tag -> tag.tagName))
-                .forEach(tag -> tags.getChildren().add(new Label(tag.tagName)));
+        nusIdValue.setText(person.getNusId().value);
     }
 }
