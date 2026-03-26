@@ -121,7 +121,7 @@ public class EditCommand extends Command {
                 .orElse(personToEdit.getTutorialGroup());
         Set<Tag> updatedTags = editPersonDescriptor.getTags().orElse(personToEdit.getTags());
 
-        return new Person(updatedName, updatedPhone, updatedEmail, updatedNusId,
+        return Person.create(updatedName, updatedPhone, updatedEmail, updatedNusId,
                 updatedSocUsername, updatedGithubUsername, updatedRole, updatedTutorialGroup, updatedTags);
     }
 

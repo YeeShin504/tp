@@ -17,7 +17,6 @@ import static cms.logic.commands.CommandTestUtil.PHONE_DESC_AMY;
 import static cms.logic.commands.CommandTestUtil.PHONE_DESC_BOB;
 import static cms.logic.commands.CommandTestUtil.PREAMBLE_NON_EMPTY;
 import static cms.logic.commands.CommandTestUtil.PREAMBLE_WHITESPACE;
-import static cms.logic.commands.CommandTestUtil.ROLE_DESC_AMY;
 import static cms.logic.commands.CommandTestUtil.ROLE_DESC_BOB;
 import static cms.logic.commands.CommandTestUtil.SOCUSERNAME_DESC_AMY;
 import static cms.logic.commands.CommandTestUtil.SOCUSERNAME_DESC_BOB;
@@ -137,9 +136,18 @@ public class AddCommandParserTest {
     public void parse_optionalFieldsMissing_success() {
         // zero tags
         Person expectedPerson = new PersonBuilder(AMY).withTags().build();
-        assertParseSuccess(parser, NAME_DESC_AMY + NUSID_DESC_AMY + ROLE_DESC_AMY + SOCUSERNAME_DESC_AMY
-                        + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY + EMAIL_DESC_AMY
-                        + TUTORIALGROUP_DESC_AMY,
+        assertParseSuccess(parser, NAME_DESC_AMY + NUSID_DESC_AMY + SOCUSERNAME_DESC_AMY
+                + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY + EMAIL_DESC_AMY
+                + TUTORIALGROUP_DESC_AMY,
+                new AddCommand(expectedPerson));
+    }
+
+    @Test
+    public void parse_roleMissing_defaultsToStudent() {
+        Person expectedPerson = new PersonBuilder(AMY).withRole("student").withTags().build();
+        assertParseSuccess(parser, NAME_DESC_AMY + NUSID_DESC_AMY + SOCUSERNAME_DESC_AMY
+                + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY + EMAIL_DESC_AMY
+                + TUTORIALGROUP_DESC_AMY,
                 new AddCommand(expectedPerson));
     }
 

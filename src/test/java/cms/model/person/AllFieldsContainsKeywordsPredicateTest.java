@@ -188,7 +188,7 @@ public class AllFieldsContainsKeywordsPredicateTest {
         PartialPerson(boolean nulNusId, boolean nulPhone, boolean nulEmail, boolean nulSoc,
                 boolean nulGithub, boolean nulRole, boolean nulTutorial) {
             super(new Name("X"), new Phone("11111111"), new Email("x@x.com"), new NusId("A0000001B"),
-                    new SocUsername("socuser"), new GithubUsername("ghuser"), Role.STUDENT,
+                new SocUsername("socuser"), new GithubUsername("ghuser"),
                     new TutorialGroup("1"), Collections.emptySet());
             this.nulNusId = nulNusId;
             this.nulPhone = nulPhone;
@@ -226,7 +226,7 @@ public class AllFieldsContainsKeywordsPredicateTest {
 
         @Override
         public Role getRole() {
-            return nulRole ? null : super.getRole();
+            return nulRole ? null : Role.STUDENT;
         }
 
         @Override
