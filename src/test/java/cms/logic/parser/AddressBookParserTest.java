@@ -20,9 +20,12 @@ import cms.logic.commands.DeleteCommand;
 import cms.logic.commands.EditCommand;
 import cms.logic.commands.EditCommand.EditPersonDescriptor;
 import cms.logic.commands.ExitCommand;
+import cms.logic.commands.ExportCommand;
 import cms.logic.commands.FilterCommand;
 import cms.logic.commands.FindCommand;
 import cms.logic.commands.HelpCommand;
+import cms.logic.commands.ImportCommand;
+import cms.logic.commands.ImportCommand.KeepPolicy;
 import cms.logic.commands.ListCommand;
 import cms.logic.commands.MaskCommand;
 import cms.logic.commands.SortCommand;
@@ -77,6 +80,38 @@ public class AddressBookParserTest {
     public void parseCommand_exit() throws Exception {
         assertTrue(parser.parseCommand(ExitCommand.COMMAND_WORD) instanceof ExitCommand);
         assertTrue(parser.parseCommand(ExitCommand.COMMAND_WORD + " 3") instanceof ExitCommand);
+    }
+
+    @Test
+    public void parseCommand_export() throws Exception {
+        String path = "data/export.json";
+        ExportCommand command = (ExportCommand) parser.parseCommand(ExportCommand.COMMAND_WORD + " " + path);
+        assertEquals(new ExportCommand(java.nio.file.Path.of(path)), command);
+
+        String quotedPathWithWhitespace = "C:/Users/Josh/My Documents/export.json";
+        ExportCommand commandQuoted = (ExportCommand) parser.parseCommand(
+            ExportCommand.COMMAND_WORD + " \"" + quotedPathWithWhitespace + "\"");
+        assertEquals(new ExportCommand(java.nio.file.Path.of(quotedPathWithWhitespace)), commandQuoted);
+    }
+
+    @Test
+    public void parseCommand_import() throws Exception {
+        String path = "data/import.json";
+        ImportCommand command = (ImportCommand) parser.parseCommand(ImportCommand.COMMAND_WORD + " " + path);
+        assertEquals(new ImportCommand(java.nio.file.Path.of(path)), command);
+
+        ImportCommand keepIncomingCommand = (ImportCommand) parser.parseCommand(
+                ImportCommand.COMMAND_WORD + " " + path + " keep/incoming");
+        assertEquals(new ImportCommand(java.nio.file.Path.of(path), KeepPolicy.INCOMING), keepIncomingCommand);
+
+        ImportCommand keepCurrentCommand = (ImportCommand) parser.parseCommand(
+                ImportCommand.COMMAND_WORD + " " + path + " keep/current");
+        assertEquals(new ImportCommand(java.nio.file.Path.of(path), KeepPolicy.CURRENT), keepCurrentCommand);
+
+        String quotedPathWithWhitespace = "C:/Users/Josh/My Documents/import.json";
+        ImportCommand commandQuoted = (ImportCommand) parser.parseCommand(
+                ImportCommand.COMMAND_WORD + " \"" + quotedPathWithWhitespace + "\"");
+        assertEquals(new ImportCommand(java.nio.file.Path.of(quotedPathWithWhitespace)), commandQuoted);
     }
 
     @Test
