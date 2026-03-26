@@ -1,6 +1,7 @@
 package cms.logic.parser;
 
 import static cms.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
+
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
@@ -15,15 +16,15 @@ import cms.logic.parser.exceptions.ParseException;
  */
 public class ImportCommandParser implements Parser<ImportCommand> {
 
-    private static final Pattern PATH_AND_OPTION_PATTERN = Pattern.compile(
-            "^\\s*(\"(?:[^\"\\\\]|\\\\.)*\"|\\S+)(?:\\s+(\\S+))?\\s*$");
-
     public static final String MESSAGE_INVALID_FILE_PATH = "File path is invalid: %1$s\n"
         + "Format: " + ImportCommand.MESSAGE_USAGE;
     public static final String MESSAGE_FILE_EXTENSION_REQUIRED = "File path must end with .json\n"
         + "Format: " + ImportCommand.MESSAGE_USAGE;
     public static final String MESSAGE_INVALID_KEEP = "keep/ must be either 'current' or 'incoming'.\n"
             + "Format: " + ImportCommand.MESSAGE_USAGE;
+
+    private static final Pattern PATH_AND_OPTION_PATTERN = Pattern.compile(
+            "^\\s*(\"(?:[^\"\\\\]|\\\\.)*\"|\\S+)(?:\\s+(\\S+))?\\s*$");
 
     @Override
     public ImportCommand parse(String args) throws ParseException {
