@@ -24,6 +24,15 @@ public class PersonTest {
     private static final String SOCUSERNAME_MISMATCHING_NUSID_FOR_TEST = "a7654321b";
 
     @Test
+    public void create_returnsCorrectSubtypeForRole() {
+        Person student = new PersonBuilder().withRole("student").build();
+        Person tutor = new PersonBuilder().withRole("tutor").build();
+
+        assertTrue(student instanceof Student);
+        assertTrue(tutor instanceof Tutor);
+    }
+
+    @Test
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {
         Person person = new PersonBuilder().build();
         assertThrows(UnsupportedOperationException.class, () -> person.getTags().remove(0));
@@ -170,7 +179,8 @@ public class PersonTest {
 
     @Test
     public void toStringMethod() {
-        String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
+        String expected = ALICE.getClass().getCanonicalName() + "{name=" + ALICE.getName()
+            + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", nusId=" + ALICE.getNusId()
                 + ", socUsername=" + ALICE.getSocUsername()
                 + ", githubUsername=" + ALICE.getGithubUsername()

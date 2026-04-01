@@ -39,6 +39,8 @@ public class SocUsernameTest {
         // valid after canonicalisation
         assertTrue(SocUsername.isValidSocUsername("  Tan8888  "));
         assertTrue(SocUsername.isValidSocUsername("  A0234567B  "));
+        assertTrue(SocUsername.isValidSocUsername("u1999999")); // accepted by current regex
+        assertTrue(SocUsername.isValidSocUsername("a0234567b")); // valid NUS-ID form (case-insensitive)
     }
 
     @Test

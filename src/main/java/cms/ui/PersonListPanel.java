@@ -4,10 +4,13 @@ import java.util.logging.Logger;
 
 import cms.commons.core.LogsCenter;
 import cms.model.person.Person;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.Region;
 
 /**
@@ -29,6 +32,23 @@ public class PersonListPanel extends UiPart<Region> {
         this.isMasked = isMasked;
         personListView.setItems(personList);
         personListView.setCellFactory(listView -> new PersonListViewCell());
+        personListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        if (!personList.isEmpty()) {
+            personListView.getSelectionModel().selectFirst();
+        }
+
+        personList.addListener((ListChangeListener<Person>) change -> {
+            if (personList.isEmpty()) {
+                personListView.getSelectionModel().clearSelection();
+            } else if (personListView.getSelectionModel().getSelectedItem() == null) {
+                personListView.getSelectionModel().selectFirst();
+            }
+        });
+    }
+
+    public ReadOnlyObjectProperty<Person> selectedPersonProperty() {
+        return personListView.getSelectionModel().selectedItemProperty();
     }
 
     /**

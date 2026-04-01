@@ -118,10 +118,10 @@ public class NameOrNusIdContainsKeywordsPredicateTest {
         NameOrNusIdContainsKeywordsPredicate predicate = new NameOrNusIdContainsKeywordsPredicate(
                 Collections.emptyList(), Collections.singletonList("A0123456B"));
 
-        // Build a normal person and override getNusId() to return null to simulate missing NusId
+        // Build a normal person (student) and override getNusId() to return null to simulate missing NusId
         Person base = new PersonBuilder().withNusId("A0123456B").build();
-        Person personWithNullNus = new Person(base.getName(), base.getPhone(), base.getEmail(), base.getNusId(),
-                base.getSocUsername(), base.getGithubUsername(), base.getRole(), base.getTutorialGroup(),
+        Person personWithNullNus = new Student(base.getName(), base.getPhone(), base.getEmail(), base.getNusId(),
+                base.getSocUsername(), base.getGithubUsername(), base.getTutorialGroup(),
                 base.getTags()) {
             @Override
             public NusId getNusId() {

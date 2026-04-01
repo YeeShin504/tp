@@ -142,7 +142,7 @@ public class PersonBuilder {
     }
 
     public Person build() {
-        return new Person(name, phone, email, nusId, socUsername, githubUsername, role, tutorialGroup, tags);
+        return Person.create(name, phone, email, nusId, socUsername, githubUsername, role, tutorialGroup, tags);
     }
 
 }

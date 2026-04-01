@@ -4,6 +4,7 @@ import static cms.storage.JsonAdaptedPerson.MISSING_FIELD_MESSAGE_FORMAT;
 import static cms.testutil.Assert.assertThrows;
 import static cms.testutil.TypicalPersons.BENSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,14 @@ public class JsonAdaptedPersonTest {
     public void toModelType_validPersonDetails_returnsPerson() throws Exception {
         JsonAdaptedPerson person = new JsonAdaptedPerson(BENSON);
         assertEquals(BENSON, person.toModelType());
+    }
+
+    @Test
+    public void toModelType_nullTags_returnsPersonWithEmptyTags() throws Exception {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_NUSID,
+                VALID_SOCUSERNAME, VALID_GITHUBUSERNAME, VALID_ROLE, VALID_TUTORIALGROUP, null);
+        Person modelPerson = person.toModelType();
+        assertTrue(modelPerson.getTags().isEmpty());
     }
 
     @Test

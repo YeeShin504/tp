@@ -48,7 +48,7 @@ public class AddCommandParser implements Parser<AddCommand> {
                         PREFIX_SOCUSERNAME, PREFIX_GITHUBUSERNAME, PREFIX_EMAIL,
                         PREFIX_PHONE, PREFIX_TUTORIALGROUP, PREFIX_TAG);
 
-        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_NUSID, PREFIX_ROLE,
+        if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_NUSID,
                 PREFIX_SOCUSERNAME, PREFIX_GITHUBUSERNAME, PREFIX_EMAIL,
                 PREFIX_PHONE, PREFIX_TUTORIALGROUP)
                 || !argMultimap.getPreamble().isEmpty()) {
@@ -60,7 +60,9 @@ public class AddCommandParser implements Parser<AddCommand> {
                 PREFIX_PHONE, PREFIX_TUTORIALGROUP);
         Name name = ParserUtil.parseName(argMultimap.getValue(PREFIX_NAME).get());
         NusId nusId = ParserUtil.parseNusId(argMultimap.getValue(PREFIX_NUSID).get());
-        Role role = ParserUtil.parseRole(argMultimap.getValue(PREFIX_ROLE).get());
+        Role role = argMultimap.getValue(PREFIX_ROLE).isPresent()
+            ? ParserUtil.parseRole(argMultimap.getValue(PREFIX_ROLE).get())
+            : Role.STUDENT;
         SocUsername socUsername = ParserUtil.parseSocUsername(argMultimap.getValue(PREFIX_SOCUSERNAME).get());
         GithubUsername githubUsername = ParserUtil.parseGithubUsername(
                 argMultimap.getValue(PREFIX_GITHUBUSERNAME).get());
@@ -71,12 +73,12 @@ public class AddCommandParser implements Parser<AddCommand> {
 
         Person person;
         try {
-            person = new Person(name, phone, email, nusId, socUsername,
+            person = Person.create(name, phone, email, nusId, socUsername,
                 githubUsername, role, tutorialGroup, tagList);
         } catch (InvalidPersonException e) {
             throw new ParseException(e.getMessage(), e);
         }
-
+        
         return new AddCommand(person);
     }
 

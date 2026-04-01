@@ -8,12 +8,15 @@ import cms.logic.Logic;
 import cms.logic.commands.CommandResult;
 import cms.logic.commands.exceptions.CommandException;
 import cms.logic.parser.exceptions.ParseException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -32,6 +35,7 @@ public class MainWindow extends UiPart<Stage> {
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
+    private PersonDetailPanel personDetailPanel;
     private ResultDisplay resultDisplay;
     private HelpWindow helpWindow;
 
@@ -42,7 +46,13 @@ public class MainWindow extends UiPart<Stage> {
     private MenuItem helpMenuItem;
 
     @FXML
+    private SplitPane mainContentSplitPane;
+
+    @FXML
     private StackPane personListPanelPlaceholder;
+
+    @FXML
+    private StackPane personDetailPlaceholder;
 
     @FXML
     private StackPane resultDisplayPlaceholder;
@@ -111,17 +121,61 @@ public class MainWindow extends UiPart<Stage> {
      * Fills up all the placeholders of this window.
      */
     void fillInnerParts() {
-        personListPanel = new PersonListPanel(logic.getFilteredPersonList(), logic.isMasked());
-        personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+        personDetailPanel = new PersonDetailPanel();
+        refreshPersonListPanel();
+        personDetailPlaceholder.getChildren().add(personDetailPanel.getRoot());
 
         resultDisplay = new ResultDisplay();
         resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
 
-        StatusBarFooter statusBarFooter = new StatusBarFooter(logic.getAddressBookFilePath());
+        StatusBarFooter statusBarFooter = new StatusBarFooter(logic.getFilteredPersonList());
         statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
 
         CommandBox commandBox = new CommandBox(this::executeCommand);
         commandBoxPlaceholder.getChildren().add(commandBox.getRoot());
+
+        Platform.runLater(this::adjustPersonListPaneWidth);
+    }
+
+    /**
+     * Sizes the left pane to the rendered card content so the app does not open with excess blank space.
+     */
+    private void adjustPersonListPaneWidth() {
+        personListPanel.getRoot().applyCss();
+        personListPanel.getRoot().layout();
+        personListPanelPlaceholder.applyCss();
+        personListPanelPlaceholder.layout();
+        mainContentSplitPane.applyCss();
+        mainContentSplitPane.layout();
+
+        double widestCard = personListPanel.getRoot().lookupAll("#cardPane").stream()
+                .filter(Region.class::isInstance)
+                .map(Region.class::cast)
+                .mapToDouble(card -> card.prefWidth(-1))
+                .max()
+                .orElse(personListPanel.getRoot().prefWidth(-1));
+
+        double targetWidth = Math.max(180, Math.ceil(widestCard) + 28);
+        personListPanelPlaceholder.setMinWidth(targetWidth);
+        personListPanelPlaceholder.setPrefWidth(targetWidth);
+        personListPanelPlaceholder.setMaxWidth(targetWidth);
+
+        double splitWidth = mainContentSplitPane.getWidth();
+        if (splitWidth > 0) {
+            mainContentSplitPane.setDividerPositions(Math.min(0.5, targetWidth / splitWidth));
+        }
+    }
+
+    /**
+     * Rebuilds the person list panel and wires its selection to the detail panel.
+     */
+    private void refreshPersonListPanel() {
+        personListPanel = new PersonListPanel(logic.getFilteredPersonList(), logic.isMasked());
+        personListPanel.selectedPersonProperty().addListener((observable, oldValue, newValue) ->
+                personDetailPanel.showPerson(newValue));
+        personDetailPanel.showPerson(personListPanel.selectedPersonProperty().get());
+
+        personListPanelPlaceholder.getChildren().setAll(personListPanel.getRoot());
     }
 
     /**
@@ -187,9 +241,7 @@ public class MainWindow extends UiPart<Stage> {
                 handleExit();
             }
 
-            personListPanelPlaceholder.getChildren().clear();
-            personListPanel = new PersonListPanel(logic.getFilteredPersonList(), logic.isMasked());
-            personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+            refreshPersonListPanel();
 
             return commandResult;
         } catch (CommandException | ParseException e) {

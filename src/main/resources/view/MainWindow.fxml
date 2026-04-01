@@ -33,26 +33,24 @@
                     </Menu>
                 </MenuBar>
 
-                <StackPane VBox.vgrow="NEVER" fx:id="commandBoxPlaceholder" styleClass="pane-with-border">
+                <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="result-strip"
+                           minHeight="38" prefHeight="38" maxHeight="38">
                     <padding>
-                        <Insets top="5" right="10" bottom="5" left="10"/>
+                        <Insets top="4" right="12" bottom="4" left="12"/>
                     </padding>
                 </StackPane>
 
-                <StackPane VBox.vgrow="NEVER" fx:id="resultDisplayPlaceholder" styleClass="pane-with-border"
-                           minHeight="100" prefHeight="100" maxHeight="100">
+                <SplitPane fx:id="mainContentSplitPane" dividerPositions="0.24"
+                           VBox.vgrow="ALWAYS" styleClass="main-content-split">
+                    <StackPane fx:id="personListPanelPlaceholder" minWidth="0"/>
+                    <StackPane fx:id="personDetailPlaceholder"/>
+                </SplitPane>
+
+                <StackPane VBox.vgrow="NEVER" fx:id="commandBoxPlaceholder" styleClass="command-strip">
                     <padding>
-                        <Insets top="5" right="10" bottom="5" left="10"/>
+                        <Insets top="0" right="10" bottom="0" left="10"/>
                     </padding>
                 </StackPane>
-
-                <VBox fx:id="personList" styleClass="pane-with-border" minWidth="340" prefWidth="340"
-                      VBox.vgrow="ALWAYS">
-                    <padding>
-                        <Insets top="10" right="10" bottom="10" left="10"/>
-                    </padding>
-                    <StackPane fx:id="personListPanelPlaceholder" VBox.vgrow="ALWAYS"/>
-                </VBox>
 
                 <StackPane fx:id="statusbarPlaceholder" VBox.vgrow="NEVER"/>
             </VBox>
