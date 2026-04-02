@@ -7,7 +7,9 @@ import static cms.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static cms.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static cms.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static cms.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ public class TagCommandParserTest {
         assertParseSuccess(parser, "add id/" + VALID_NUSID_AMY + " " + VALID_NUSID_BOB + " tag/friend",
                 TagCommand.byNusIds(Action.ADD, List.of(new NusId(VALID_NUSID_AMY), new NusId(VALID_NUSID_BOB)),
                         List.of(new Tag("friend"))));
+
+        assertParseSuccess(parser, "add n/1 tag/friend friend",
+                new TagCommand(Action.ADD, List.of(INDEX_FIRST_PERSON), List.of(new Tag("friend"))));
     }
 
     @Test
@@ -52,5 +57,19 @@ public class TagCommandParserTest {
         assertParseFailure(parser, "add 1 tag/friend", expectedMessage);
         assertParseFailure(parser, "add n/1 id/" + VALID_NUSID_AMY + " tag/friend", expectedMessage);
         assertParseFailure(parser, "delete n/1", expectedMessage);
+        assertParseFailure(parser, "add tag/friend", expectedMessage);
+        assertParseFailure(parser, "add n/1 tag/   ", expectedMessage);
+        assertParseFailure(parser, "delete n/1 x", expectedMessage);
+    }
+
+    @Test
+    public void splitValues_skipsEmptyTokens() throws Exception {
+        Method splitValues = TagCommandParser.class.getDeclaredMethod("splitValues", List.class);
+        splitValues.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        List<String> result = (List<String>) splitValues.invoke(parser, List.of("   ", "friend tutor", " mentor "));
+
+        assertEquals(List.of("friend", "tutor", "mentor"), result);
     }
 }
