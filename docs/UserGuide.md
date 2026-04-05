@@ -45,7 +45,8 @@ Action | Format
 **List** | `list`
 **Add** | `add n/NAME m/NUS_MATRIC role/ROLE soc/SOC_USERNAME gh/GITHUB_USERNAME e/EMAIL p/PHONE t/TUTORIAL_GROUP [tag/TAG]...`<br><br>e.g. `add n/John Doe m/A0234567B role/tutor soc/johndoe gh/johndoe e/johndoe@u.nus.edu p/91234567 t/01`
 **Edit** | `edit INDEX [n/NAME] [m/NUS_MATRIC] [role/ROLE] [soc/SOC_USERNAME] [gh/GITHUB_USERNAME] [e/EMAIL] [p/PHONE] [t/TUTORIAL_GROUP] [tag/TAG]...`<br><br>e.g. `edit 2 p/98765432 e/johndoe@example.com`
-**Find** | `find a/KEYWORD [MORE_KEYWORDS]...`<br>`find n/KEYWORD [MORE_NAME_KEYWORDS]...`<br>`find m/NUS_MATRIC [MORE_NUS_MATRICS]...`<br><br>e.g. `find n/jane n/eunice m/A0123456B`
+**Find** | `find a/KEYWORD [MORE_KEYWORDS]...`<br>`find n/KEYWORD [MORE_NAME_KEYWORDS]...`<br>`find m/NUS_MATRIC [MORE_NUS_MATRIC]...`<br><br>e.g. `find n/jane n/eunice m/A0123456B`
+**Tag** | `tag add n/INDEX [MORE_INDEXES]... tag/TAG [MORE_TAGS]...`<br>`tag add m/NUS_MATRIC[MORE_NUS_MATRICS]... tag/TAG [MORE_TAGS]...`<br>`tag delete n/INDEX [MORE_INDEXES]... tag/TAG [MORE_TAGS]...`<br>`tag delete m/NUS_MATRIC [MORE_NUS_MATRICS]... tag/TAG [MORE_TAGS]...`<br><br>e.g. `tag add n/1 2 tag/friend tutor`
 **Delete** | `delete INDEX`<br>`delete INDEX [MORE_INDEXES]...`<br>`delete m/NUS_MATRIC`<br><br>e.g. `delete 1 3 5`
 **Import** | `import FILE_PATH [keep/current|keep/incoming]`<br><br>e.g. `import data/addressbook.json keep/current`
 **Export** | `export FILE_PATH`<br><br>e.g. `export "C:\\Users\\Josh\\Documents\\backup.json"`
@@ -142,6 +143,29 @@ Examples:
 * `find m/A0123456B A1234567C`
 * `find m/A0123456B m/A1234567C`
 
+### Adding or removing tags : `tag`
+
+Adds or removes one or more tags from one or more persons.
+
+Format:
+* `tag add n/INDEX [MORE_INDEXES]... tag/TAG [MORE_TAGS]...`
+* `tag add id/NUS_ID [MORE_NUS_IDS]... tag/TAG [MORE_TAGS]...`
+* `tag delete n/INDEX [MORE_INDEXES]... tag/TAG [MORE_TAGS]...`
+* `tag delete id/NUS_ID [MORE_NUS_IDS]... tag/TAG [MORE_TAGS]...`
+
+* Use `add` to add tags and `delete` to remove tags.
+* Target persons by either displayed index (`n/`) or NUS ID (`id/`), but not both in the same command.
+* For index-based tagging, each index refers to the displayed list and must be a positive integer.
+* At least one target person and one tag must be provided.
+* Existing tags are not duplicated.
+* Tag values must follow the same rules as [`tag/TAG`](#field-tag).
+
+Examples:
+* `tag add n/1 2 tag/friend tutor`
+* `tag add id/A1234567B A2345678C tag/mentor`
+* `tag delete n/3 tag/friend`
+* `tag delete id/A1234567B tag/mentor`
+
 ### Deleting a student / tutor : `delete`
 
 Deletes one or more persons by displayed index, or by NUS Matric.
@@ -235,7 +259,7 @@ Use this section as a quick checklist for `add` and `edit`.
 * Valid: `n/John Doe`
 * Invalid: `n/John@Doe`
 
-<a id="field-nus-id"></a>
+<a id="field-nus-matric"></a>
 **`m/NUS_MATRIC`**
 * Must be `A` + 7 digits + uppercase letter (e.g. `A0234567B`).
 * Must be unique in CMS.
