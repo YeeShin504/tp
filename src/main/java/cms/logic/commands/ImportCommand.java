@@ -3,8 +3,16 @@ package cms.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
+import cms.commons.exceptions.DataLoadingException;
+import cms.logic.commands.exceptions.CommandException;
+import cms.model.AddressBook;
 import cms.model.Model;
+import cms.model.ReadOnlyAddressBook;
+import cms.model.person.Person;
+import cms.storage.Storage;
 
 /**
  * Imports address book data from a user-specified JSON file path into the application.
@@ -29,6 +37,13 @@ public class ImportCommand extends Command {
             "Address book merged from: %s (conflicts resolved with keep/current)";
     public static final String MESSAGE_KEEP_INCOMING_SUCCESS =
             "Address book merged from: %s (conflicts resolved with keep/incoming)";
+    public static final String MESSAGE_EMPTY_OR_INVALID_FILE =
+            "Import file is empty or not a valid Course Management System data file.";
+    public static final String MESSAGE_INVALID_DATA =
+            "Import file contains invalid Course Management System data.";
+    public static final String MESSAGE_KEEP_REQUIRED_NON_EMPTY = "Current data is non-empty. "
+            + "Re-run with keep/current to keep existing values on conflicts, "
+            + "or keep/incoming to use imported values on conflicts.";
 
     /** Resolution policy when importing into a non-empty address book. */
     public enum KeepPolicy {
@@ -58,9 +73,74 @@ public class ImportCommand extends Command {
     }
 
     @Override
-    public CommandResult execute(Model model) {
+    public CommandResult execute(Model model) throws CommandException {
+        throw new CommandException("Import command requires storage context.");
+    }
+
+    @Override
+    public CommandResult execute(Model model, Storage storage) throws CommandException {
         requireNonNull(model);
-        return new CommandResult(String.format(MESSAGE_SUCCESS, importFilePath));
+        requireNonNull(storage);
+
+        ReadOnlyAddressBook importedAddressBook;
+        try {
+            importedAddressBook = storage.readAddressBook(importFilePath)
+                    .orElseThrow(() -> new CommandException(MESSAGE_EMPTY_OR_INVALID_FILE));
+        } catch (DataLoadingException dle) {
+            throw new CommandException(MESSAGE_INVALID_DATA, dle);
+        }
+
+        boolean hasCurrentData = !model.getAddressBook().getPersonList().isEmpty();
+        if (hasCurrentData && keepPolicy == null) {
+            throw new CommandException(MESSAGE_KEEP_REQUIRED_NON_EMPTY);
+        }
+
+        if (!hasCurrentData) {
+            model.setAddressBook(importedAddressBook);
+            model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+            return new CommandResult(String.format(MESSAGE_SUCCESS, importFilePath));
+        }
+
+        AddressBook mergedAddressBook = new AddressBook(model.getAddressBook());
+        for (Person incomingPerson : importedAddressBook.getPersonList()) {
+            List<Person> conflictingPersons = findConflictingPersons(mergedAddressBook, incomingPerson);
+            if (conflictingPersons.isEmpty()) {
+                mergedAddressBook.addPerson(incomingPerson);
+                continue;
+            }
+
+            if (keepPolicy == KeepPolicy.CURRENT) {
+                continue;
+            }
+
+            for (Person conflictingPerson : conflictingPersons) {
+                mergedAddressBook.removePerson(conflictingPerson);
+            }
+            mergedAddressBook.addPerson(incomingPerson);
+        }
+
+        model.setAddressBook(mergedAddressBook);
+        model.updateFilteredPersonList(Model.PREDICATE_SHOW_ALL_PERSONS);
+
+        if (keepPolicy == KeepPolicy.CURRENT) {
+            return new CommandResult(String.format(MESSAGE_KEEP_CURRENT_SUCCESS, importFilePath));
+        }
+        return new CommandResult(String.format(MESSAGE_KEEP_INCOMING_SUCCESS, importFilePath));
+    }
+
+    /**
+     * Finds persons in {@code currentAddressBook} that conflict with {@code incomingPerson}
+     * by identity or by unique-field collision.
+     */
+    private List<Person> findConflictingPersons(ReadOnlyAddressBook currentAddressBook, Person incomingPerson) {
+        List<Person> conflicts = new ArrayList<>();
+        for (Person existingPerson : currentAddressBook.getPersonList()) {
+            if (incomingPerson.isSamePerson(existingPerson)
+                    || incomingPerson.findConflictingField(existingPerson) != null) {
+                conflicts.add(existingPerson);
+            }
+        }
+        return conflicts;
     }
 
     public Path getImportFilePath() {

@@ -217,7 +217,7 @@ public class LogicManagerTest {
         Path exportPath = temporaryFolder.resolve("exports").resolve("willFail.json");
         String exportCommand = ExportCommand.COMMAND_WORD + " \"" + exportPath + "\"";
         String expectedMessage = String.format(
-                LogicManager.FILE_OPS_EXPORT_ERROR_FORMAT, exportPath, exportException.getMessage());
+            ExportCommand.MESSAGE_EXPORT_ERROR_FORMAT, exportPath, exportException.getMessage());
 
         assertCommandFailure(exportCommand, CommandException.class, expectedMessage);
     }
@@ -321,7 +321,7 @@ public class LogicManagerTest {
 
         Path normalizedImportPath = importPath.toAbsolutePath().normalize();
         String importCommand = buildImportCommand(normalizedImportPath, null);
-        assertCommandFailure(importCommand, CommandException.class, LogicManager.IMPORT_KEEP_REQUIRED_NON_EMPTY);
+        assertCommandFailure(importCommand, CommandException.class, ImportCommand.MESSAGE_KEEP_REQUIRED_NON_EMPTY);
         assertEquals(1, model.getFilteredPersonList().size());
         assertEquals(expectedCurrentPerson, model.getFilteredPersonList().get(0));
     }
