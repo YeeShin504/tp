@@ -32,10 +32,18 @@ public class DeleteCommandParserTest {
         assertParseSuccess(parser, "1 2", new DeleteCommand(List.of(INDEX_FIRST_PERSON, INDEX_SECOND_PERSON)));
         assertParseSuccess(parser, "m/" + VALID_NUSMATRIC_AMY,
                 DeleteCommand.byNusMatric(new NusMatric(VALID_NUSMATRIC_AMY)));
+        assertParseSuccess(parser, "m/ " + VALID_NUSMATRIC_AMY,
+                DeleteCommand.byNusMatric(new NusMatric(VALID_NUSMATRIC_AMY)));
         assertParseSuccess(parser, "m/" + VALID_NUSMATRIC_AMY + " " + VALID_NUSMATRIC_BOB,
                 DeleteCommand.byNusMatrics(List.of(
                         new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
+        assertParseSuccess(parser, "m/ " + VALID_NUSMATRIC_AMY + " " + VALID_NUSMATRIC_BOB,
+                DeleteCommand.byNusMatrics(List.of(
+                        new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
         assertParseSuccess(parser, "m/" + VALID_NUSMATRIC_AMY + " m/" + VALID_NUSMATRIC_BOB,
+                DeleteCommand.byNusMatrics(List.of(
+                        new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
+        assertParseSuccess(parser, "m/ " + VALID_NUSMATRIC_AMY + " m/ " + VALID_NUSMATRIC_BOB,
                 DeleteCommand.byNusMatrics(List.of(
                         new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
     }
