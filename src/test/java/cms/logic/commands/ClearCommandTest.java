@@ -44,6 +44,14 @@ public class ClearCommandTest {
     }
 
     @Test
+    public void execute_clearWithEmptyIgnoredArgs_noWarning() {
+        Model model = new ModelManager();
+        Model expectedModel = new ModelManager();
+        // Empty string should not trigger warning
+        assertCommandSuccess(new ClearCommand(""), model, ClearCommand.MESSAGE_SUCCESS, expectedModel);
+    }
+
+    @Test
     public void equals() {
         ClearCommand clearCommand = new ClearCommand();
         ClearCommand clearCommandWithArgs = new ClearCommand("tag");
@@ -66,5 +74,26 @@ public class ClearCommandTest {
         // different ignoredArgs -> returns false
         assertNotEquals(clearCommand, clearCommandWithArgs);
         assertNotEquals(clearCommandWithArgs, clearCommandWithDifferentArgs);
+    }
+
+    @Test
+    public void hashCode_sameIgnoredArgs_sameHashCode() {
+        ClearCommand clearCommand1 = new ClearCommand("tag");
+        ClearCommand clearCommand2 = new ClearCommand("tag");
+        assertEquals(clearCommand1.hashCode(), clearCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_differentIgnoredArgs_differentHashCode() {
+        ClearCommand clearCommand1 = new ClearCommand("tag");
+        ClearCommand clearCommand2 = new ClearCommand("all");
+        assertNotEquals(clearCommand1.hashCode(), clearCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_nullIgnoredArgs_consistent() {
+        ClearCommand clearCommand1 = new ClearCommand();
+        ClearCommand clearCommand2 = new ClearCommand();
+        assertEquals(clearCommand1.hashCode(), clearCommand2.hashCode());
     }
 }

@@ -49,6 +49,12 @@ public class ListCommandTest {
     }
 
     @Test
+    public void execute_listWithEmptyIgnoredArgs_noWarning() {
+        // Empty string should not trigger warning
+        assertCommandSuccess(new ListCommand(""), model, ListCommand.MESSAGE_SUCCESS, expectedModel);
+    }
+
+    @Test
     public void equals() {
         ListCommand listCommand = new ListCommand();
         ListCommand listCommandWithArgs = new ListCommand("abc");
@@ -71,5 +77,26 @@ public class ListCommandTest {
         // different ignoredArgs -> returns false
         assertNotEquals(listCommand, listCommandWithArgs);
         assertNotEquals(listCommandWithArgs, listCommandWithDifferentArgs);
+    }
+
+    @Test
+    public void hashCode_sameIgnoredArgs_sameHashCode() {
+        ListCommand listCommand1 = new ListCommand("abc");
+        ListCommand listCommand2 = new ListCommand("abc");
+        assertEquals(listCommand1.hashCode(), listCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_differentIgnoredArgs_differentHashCode() {
+        ListCommand listCommand1 = new ListCommand("abc");
+        ListCommand listCommand2 = new ListCommand("xyz");
+        assertNotEquals(listCommand1.hashCode(), listCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_nullIgnoredArgs_consistent() {
+        ListCommand listCommand1 = new ListCommand();
+        ListCommand listCommand2 = new ListCommand();
+        assertEquals(listCommand1.hashCode(), listCommand2.hashCode());
     }
 }

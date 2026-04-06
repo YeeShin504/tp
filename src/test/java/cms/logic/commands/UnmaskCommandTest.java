@@ -38,6 +38,16 @@ public class UnmaskCommandTest {
     }
 
     @Test
+    public void execute_unmaskWithEmptyIgnoredArgs_noWarning() {
+        Model model = new ModelManager(TypicalPersons.getTypicalAddressBook(), new UserPrefs());
+        model.setMasked(true);
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+        expectedModel.setMasked(false);
+        // Empty string should not trigger warning
+        assertCommandSuccess(new UnmaskCommand(""), model, UnmaskCommand.MESSAGE_SUCCESS, expectedModel);
+    }
+
+    @Test
     public void equals() {
         UnmaskCommand unmaskCommand = new UnmaskCommand();
         UnmaskCommand unmaskCommandWithArgs = new UnmaskCommand("username");
@@ -60,5 +70,26 @@ public class UnmaskCommandTest {
         // different ignoredArgs -> returns false
         assertNotEquals(unmaskCommand, unmaskCommandWithArgs);
         assertNotEquals(unmaskCommandWithArgs, unmaskCommandWithDifferentArgs);
+    }
+
+    @Test
+    public void hashCode_sameIgnoredArgs_sameHashCode() {
+        UnmaskCommand unmaskCommand1 = new UnmaskCommand("username");
+        UnmaskCommand unmaskCommand2 = new UnmaskCommand("username");
+        assertEquals(unmaskCommand1.hashCode(), unmaskCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_differentIgnoredArgs_differentHashCode() {
+        UnmaskCommand unmaskCommand1 = new UnmaskCommand("username");
+        UnmaskCommand unmaskCommand2 = new UnmaskCommand("all");
+        assertNotEquals(unmaskCommand1.hashCode(), unmaskCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_nullIgnoredArgs_consistent() {
+        UnmaskCommand unmaskCommand1 = new UnmaskCommand();
+        UnmaskCommand unmaskCommand2 = new UnmaskCommand();
+        assertEquals(unmaskCommand1.hashCode(), unmaskCommand2.hashCode());
     }
 }

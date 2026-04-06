@@ -31,6 +31,13 @@ public class ExitCommandTest {
     }
 
     @Test
+    public void execute_exitWithEmptyIgnoredArgs_noWarning() {
+        // Empty string should not trigger warning
+        CommandResult expectedCommandResult = new CommandResult(MESSAGE_EXIT_ACKNOWLEDGEMENT, false, true);
+        assertCommandSuccess(new ExitCommand(""), model, expectedCommandResult, expectedModel);
+    }
+
+    @Test
     public void equals() {
         ExitCommand exitCommand = new ExitCommand();
         ExitCommand exitCommandWithArgs = new ExitCommand("now");
@@ -53,5 +60,26 @@ public class ExitCommandTest {
         // different ignoredArgs -> returns false
         assertNotEquals(exitCommand, exitCommandWithArgs);
         assertNotEquals(exitCommandWithArgs, exitCommandWithDifferentArgs);
+    }
+
+    @Test
+    public void hashCode_sameIgnoredArgs_sameHashCode() {
+        ExitCommand exitCommand1 = new ExitCommand("now");
+        ExitCommand exitCommand2 = new ExitCommand("now");
+        assertEquals(exitCommand1.hashCode(), exitCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_differentIgnoredArgs_differentHashCode() {
+        ExitCommand exitCommand1 = new ExitCommand("now");
+        ExitCommand exitCommand2 = new ExitCommand("later");
+        assertNotEquals(exitCommand1.hashCode(), exitCommand2.hashCode());
+    }
+
+    @Test
+    public void hashCode_nullIgnoredArgs_consistent() {
+        ExitCommand exitCommand1 = new ExitCommand();
+        ExitCommand exitCommand2 = new ExitCommand();
+        assertEquals(exitCommand1.hashCode(), exitCommand2.hashCode());
     }
 }
