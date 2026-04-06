@@ -2,9 +2,12 @@ package cms.logic.commands;
 
 import static cms.logic.commands.CommandTestUtil.assertCommandSuccess;
 import static cms.logic.commands.ExitCommand.MESSAGE_EXIT_ACKNOWLEDGEMENT;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
+import cms.logic.Messages;
 import cms.model.Model;
 import cms.model.ModelManager;
 
@@ -16,5 +19,39 @@ public class ExitCommandTest {
     public void execute_exit_success() {
         CommandResult expectedCommandResult = new CommandResult(MESSAGE_EXIT_ACKNOWLEDGEMENT, false, true);
         assertCommandSuccess(new ExitCommand(), model, expectedCommandResult, expectedModel);
+    }
+
+    @Test
+    public void execute_exitWithIgnoredArgs_showsWarning() {
+        String ignoredArgs = "now";
+        String expectedMessage = MESSAGE_EXIT_ACKNOWLEDGEMENT + "\n"
+                + String.format(Messages.MESSAGE_IGNORED_PARAMETERS, ignoredArgs);
+        CommandResult expectedCommandResult = new CommandResult(expectedMessage, false, true);
+        assertCommandSuccess(new ExitCommand(ignoredArgs), model, expectedCommandResult, expectedModel);
+    }
+
+    @Test
+    public void equals() {
+        ExitCommand exitCommand = new ExitCommand();
+        ExitCommand exitCommandWithArgs = new ExitCommand("now");
+        ExitCommand exitCommandWithSameArgs = new ExitCommand("now");
+        ExitCommand exitCommandWithDifferentArgs = new ExitCommand("later");
+
+        // same object -> returns true
+        assertEquals(exitCommand, exitCommand);
+
+        // same values -> returns true
+        assertEquals(exitCommand, new ExitCommand());
+        assertEquals(exitCommandWithArgs, exitCommandWithSameArgs);
+
+        // different types -> returns false
+        assertNotEquals(exitCommand, 1);
+
+        // null -> returns false
+        assertNotEquals(exitCommand, null);
+
+        // different ignoredArgs -> returns false
+        assertNotEquals(exitCommand, exitCommandWithArgs);
+        assertNotEquals(exitCommandWithArgs, exitCommandWithDifferentArgs);
     }
 }
