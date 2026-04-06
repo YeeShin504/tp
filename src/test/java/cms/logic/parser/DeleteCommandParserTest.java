@@ -46,12 +46,17 @@ public class DeleteCommandParserTest {
         assertParseSuccess(parser, "m/ " + VALID_NUSMATRIC_AMY + " m/ " + VALID_NUSMATRIC_BOB,
                 DeleteCommand.byNusMatrics(List.of(
                         new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
+        assertParseSuccess(parser, "m/" + VALID_NUSMATRIC_AMY + " m/  m/ " + VALID_NUSMATRIC_BOB,
+                DeleteCommand.byNusMatrics(List.of(
+                        new NusMatric(VALID_NUSMATRIC_AMY), new NusMatric(VALID_NUSMATRIC_BOB))));
     }
 
     @Test
     public void parse_invalidArgs_throwsParseException() {
         assertParseFailure(parser, "a", String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
         assertParseFailure(parser, "   ",
+                String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
+        assertParseFailure(parser, "m/   ",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
         assertParseFailure(parser, "m/" + VALID_NUSMATRIC_AMY + " 1",
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
