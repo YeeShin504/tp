@@ -1,8 +1,8 @@
 package cms.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
 
 import cms.model.Model;
@@ -54,7 +55,8 @@ public class ExportCommandTest {
         ExportCommand exportCommand = new ExportCommand(path);
 
         Model model = new ModelManager();
-        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json")) {
+        Path addressBookPath = temporaryFolder.resolve("addressBook.json");
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(addressBookPath) {
             @Override
             public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath) throws IOException {
                 throw new AccessDeniedException(filePath.toString());
@@ -64,9 +66,9 @@ public class ExportCommandTest {
                 addressBookStorage,
                 new JsonUserPrefsStorage(temporaryFolder.resolve("userPrefs.json")));
 
-        cms.logic.commands.exceptions.CommandException exception = assertThrows(
-                cms.logic.commands.exceptions.CommandException.class,
-                () -> exportCommand.execute(model, storage));
+        Executable exportExecution = () -> exportCommand.execute(model, storage);
+        cms.logic.commands.exceptions.CommandException exception =
+            assertThrows(cms.logic.commands.exceptions.CommandException.class, exportExecution);
         assertEquals(String.format(ExportCommand.MESSAGE_EXPORT_PERMISSION_ERROR_FORMAT, path),
                 exception.getMessage());
     }
