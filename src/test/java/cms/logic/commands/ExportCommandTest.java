@@ -2,7 +2,10 @@ package cms.logic.commands;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -11,6 +14,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import cms.model.Model;
 import cms.model.ModelManager;
+import cms.model.ReadOnlyAddressBook;
 import cms.storage.JsonAddressBookStorage;
 import cms.storage.JsonUserPrefsStorage;
 import cms.storage.StorageManager;
@@ -33,5 +37,37 @@ public class ExportCommandTest {
         CommandResult result = exportCommand.execute(model, storage);
         assertEquals(String.format(ExportCommand.MESSAGE_SUCCESS, path), result.getFeedbackToUser());
         assertTrue(Files.exists(path));
+    }
+
+    @Test
+    public void execute_withoutStorageContext_throwsCommandException() {
+        Path path = temporaryFolder.resolve("data").resolve("export.json");
+        ExportCommand exportCommand = new ExportCommand(path);
+
+        Model model = new ModelManager();
+        assertThrows(cms.logic.commands.exceptions.CommandException.class, () -> exportCommand.execute(model));
+    }
+
+    @Test
+    public void execute_storagePermissionDenied_throwsCommandException() {
+        Path path = temporaryFolder.resolve("data").resolve("exportDenied.json");
+        ExportCommand exportCommand = new ExportCommand(path);
+
+        Model model = new ModelManager();
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json")) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook, Path filePath) throws IOException {
+                throw new AccessDeniedException(filePath.toString());
+            }
+        };
+        StorageManager storage = new StorageManager(
+                addressBookStorage,
+                new JsonUserPrefsStorage(temporaryFolder.resolve("userPrefs.json")));
+
+        cms.logic.commands.exceptions.CommandException exception = assertThrows(
+                cms.logic.commands.exceptions.CommandException.class,
+                () -> exportCommand.execute(model, storage));
+        assertEquals(String.format(ExportCommand.MESSAGE_EXPORT_PERMISSION_ERROR_FORMAT, path),
+                exception.getMessage());
     }
 }
