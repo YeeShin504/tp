@@ -87,7 +87,7 @@ Action | Format
 * Items in square brackets are optional.
 * `...` means the field can be repeated.
 * Parameters can be in any order.
-* For commands without parameters (`help`, `list`, `exit`, `clear`), extra text is ignored.
+* For commands without parameters (`list`, `exit`, `clear`), extra text is ignored.
 * e.g. `add n/John Doe m/A0234567B role/tutor soc/johndoe gh/johndoe e/johndoe@u.nus.edu p/91234567 t/01 tag/mentor`
 </div>
 
@@ -360,7 +360,7 @@ Leading/trailing spaces are trimmed for all field values before validation.
 
 <a id="field-nus-matric"></a>
 **`m/NUS_MATRIC`**
-* Must be `A` or `U` + 7 digits + uppercase letter (e.g. `A0234567B`, `U1234567Z`).
+* Must be `A` + 7 digits + uppercase letter (e.g. `A0234567X`) or `U` + 7 digits + uppercase letter (e.g. `U023456W`).
 * Must be unique in CMS.
 * Case sensitivity: case-insensitive input (stored in uppercase).
 * Valid: `m/A0234567B`
@@ -443,7 +443,7 @@ Leading/trailing spaces are trimmed for all field values before validation.
 
 **INDEX**: A 1-based position of a person in the currently displayed list.
 
-**NUS Matric**: Identifier in format `A` or `U` + 7 digits + a letter, e.g. `A0234567B`.
+**NUS Matric**: Identifier given by NUS in format `A` + 7 digits + a letter,(`A0234567B`) or `U` + 6 digits + a letter (e.g., `U023456W`).
 
 **SoC username**: School of Computing account username stored in the `soc/` field.
 
