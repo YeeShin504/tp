@@ -327,50 +327,55 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1.  Course coordinator requests to list students who are not assigned to any tutorial group
-2.  Course Management System shows the filtered list of unassigned students
-3.  Course coordinator selects a student and requests to assign the student to a specified tutorial group
-4.  Course Management System assigns the student
+1.  Course coordinator requests to list all persons
+2.  Course Management System shows all persons
+3.  Course coordinator requests to update a student's tutorial group
+4.  Course Management System updates the student's tutorial group
 
       Use case ends.
 
 **Extensions**
 
-* 2a. There are no unassigned students.
+* 2a. There are no students in the system.
 
    Use case ends.
 
 * 3a. The specified tutorial group does not exist.
 
    * 3a1. Course Management System shows an error message.
-   * 3a2. Course coordinator creates the tutorial group.
-   * 3a3. Course coordinator retries the assignment.
+   * 3a2. Course coordinator retries with a valid tutorial group.
 
       Use case resumes at step 3.
 
-**Use case: Import a student roster from CSV/Excel**
+**Use case: Import records from JSON**
 
 **MSS**
 
-1.  Course coordinator requests to import roster data and provides a file path
+1.  Course coordinator requests to import data and provides a JSON file path
 2.  Course Management System parses the file and validates the records
-3.  Course Management System shows a preview summary (e.g., number of records, warnings, duplicates)
-4.  Course Management System imports the records and shows a completion summary
+3.  Course Management System imports the records and shows a completion summary
 
     Use case ends.
 
 **Extensions**
 
-* 2a. The file cannot be read (missing, corrupted, unsupported format).
+* 2a. The file cannot be read (missing, corrupted, invalid path, or unsupported extension).
 
    * 2a1. Course Management System shows an error message describing the issue.
 
       Use case ends.
 
-* 2b. Some records contain invalid data.
+* 2b. Existing data is non-empty and no keep policy is provided.
 
-   * 2b1. Course Management System shows validation warnings and which rows/fields are problematic.
-   * 2b2. Course coordinator fixes the source file and retries the import.
+   * 2b1. Course Management System rejects the command and asks for `keep/current` or `keep/incoming`.
+   * 2b2. Course coordinator retries the import with a keep policy.
+
+      Use case resumes at step 1.
+
+* 2c. Some records contain invalid data.
+
+   * 2c1. Course Management System shows an error message.
+   * 2c2. Course coordinator fixes the source file and retries the import.
 
       Use case resumes at step 1.
 
@@ -420,17 +425,14 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
 
-   1. Test case: `add n/John Doe m/A0123456X role/student soc/johnd gh/john-gh p/91234567
-      e/john@example.com t/T01`<br>
+   1. Test case: `add n/John Doe m/A0123456X role/student soc/johnd gh/john-gh p/91234567 e/john@example.com t/01`<br>
       Expected: New contact is added to the list. Details of the added contact shown in the status message.
 
-   1. Test case: `add n/David Tan m/A0211111C role/student soc/david1 gh/davidtan99
-      e/david@u.nus.edu p/97654321 t/T05` twice<br>
+   1. Test case: Repeat the same `add` command above a second time.<br>
       Expected: If a person with the same NUS Matric / SoC username / GitHub username / email already exists,
-      the app shows an error message indicating
-      a duplicate NUS Matric. No person is added. Status bar remains the same.
+      the app shows an error message indicating a duplicate unique field. No person is added.
 
-   1. Other incorrect add commands to try: `add`, `add n/`<br>
+   1. Incorrect add command to try: `add`<br>
       Expected: Validation errors are shown describing the missing required fields or incorrect format.
 
 ### Deleting a person
@@ -439,23 +441,87 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: List all persons using the `list` command. Multiple persons in the list.
 
-   1. Test case: `delete 1`<br>
-      Expected: First contact is deleted from the list. Details of the deleted contact shown in the status message.
-
    1. Test case: `delete 1 3`<br>
-      Expected: First and third contacts are deleted from the list. Details of the deleted contacts shown in the status message.
+      Expected: The first and third shown contacts are deleted in one command.
 
-   1. Test case: `delete m/A0000001B`<br>
-      Expected: The contact with NUS Matric `A0000001B` is deleted from the list. Details of the deleted contact shown in the status message.
+   1. Test case: `delete m/A0123456X`<br>
+      Expected: The person with NUS Matric `A0123456X` is deleted.
 
-   1. Test case: `delete m/A0000001B A0000003D`<br>
-      Expected: The contacts with NUS Matrics `A0000001B` and `A0000003D` are deleted from the list. Details of the deleted contacts shown in the status message.
-
-   1. Test case: `delete 1 1`<br>
-      Expected: First contact is deleted only once. Details of the deleted contact shown in the status message.
-
-   1. Test case: `delete m/A0000001B A0000001B`<br>
-      Expected: The contact with NUS Matric `A0000001B` is deleted only once. Details of the deleted contact shown in the status message.
-
-   1. Other incorrect delete commands to try: `delete`, `delete 0`, `delete x`, `delete 999`, `delete m/A9999999Z`<br>
+   1. Incorrect delete command to try: `delete m/A9999999Z`<br>
       Expected: Error messages are shown describing the invalid command format or invalid target person(s).
+
+### Tagging persons
+
+1. Adding and removing tags
+
+   1. Prerequisites: `list` has at least two persons.
+
+   1. Test case: `tag add n/1 2 tag/mentor`<br>
+      Expected: Tag `mentor` is added to both target persons.
+
+   1. Test case: `tag delete n/1 tag/mentor`<br>
+      Expected: Tag `mentor` is removed from person 1.
+
+   1. Incorrect command to try: `tag add n/1 m/A0123456X tag/mentor`<br>
+      Expected: Command is rejected because index and matric targeting cannot be mixed.
+
+### Filtering persons
+
+1. Filtering by tag/tutorial group
+
+   1. Prerequisites: Add tags/tutorial groups so some people match and some do not.
+
+   1. Test case: `filter tag/mentor t/01`<br>
+      Expected: Only persons that have tag `mentor` and tutorial group `01` remain in the shown list.
+
+   1. Incorrect command to try: `filter`<br>
+      Expected: Command is rejected because at least one filter must be provided.
+
+### Sorting persons
+
+1. Sorting by supported keys
+
+   1. Test case: `sort name`<br>
+      Expected: Persons are sorted by name.
+
+   1. Test case: `sort tg`<br>
+      Expected: Persons are sorted by tutorial group.
+
+   1. Incorrect command to try: `sort tag`<br>
+      Expected: Command is rejected with usage guidance.
+
+### Masking and unmasking
+
+1. Toggle display masking
+
+   1. Test case: `mask`<br>
+      Expected: Sensitive fields (NUS Matric, SoC username, GitHub username, email, phone) are masked in list/detail panels.
+
+   1. Test case: `unmask`<br>
+      Expected: Sensitive fields are shown again.
+
+### Exporting and importing JSON data
+
+1. Export current data
+
+   1. Test case: `export data/manual-test-export.json`<br>
+      Expected: Command succeeds and creates/overwrites `data/manual-test-export.json`.
+
+   1. Incorrect command to try: `export data/manual-test-export.txt`<br>
+      Expected: Command is rejected because file path must end with `.json`.
+
+1. Import data with and without keep policy
+
+   1. Prerequisites: Use the exported file from the previous test.
+
+   1. Test case: `import data/manual-test-export.json` (when current data is non-empty)<br>
+      Expected: Command is rejected and asks for `keep/current` or `keep/incoming`.
+
+   1. Test case: `import data/manual-test-export.json keep/current`<br>
+      Expected: Command succeeds and keeps existing records where conflicts occur.
+
+   1. Test case: `import data/manual-test-export.json keep/incoming`<br>
+      Expected: Command succeeds and incoming records replace existing conflicting records.
+
+   1. Incorrect command to try: `import data/manual-test-export.txt`<br>
+      Expected: Command is rejected because file path must end with `.json`.
