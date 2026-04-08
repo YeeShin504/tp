@@ -136,6 +136,26 @@ Examples:
 * `edit 2 n/Betsy Crower tag/`
 * `edit 3 m/A0654321B role/student soc/betsy3 gh/betsycrowe t/07`
 
+### Filtering students / tutors : `filter`
+
+Filters persons by tag, tutorial group, or both.
+
+Format: `filter [tag/TAG]... [t/TUTORIAL_GROUP_NUMBER]`
+
+* At least one filter must be provided.
+* `tag/` can be repeated to filter by multiple tags.
+* `t/` can appear at most once.
+* If multiple `tag/` values are given, a person must have all of them.
+* If `t/` is given, a person must belong to that tutorial group.
+* When both `tag/` and `t/` are provided, a person must satisfy both filters.
+* Tag matching is case-insensitive.
+* Tutorial group input accepts values from `1` to `99`, with leading zeros allowed (e.g. `t/1`, `t/01`, and `t/001` are all accepted).
+
+Examples:
+* `filter tag/friend`
+* `filter t/01`
+* `filter tag/friend tag/mentor`
+* `filter tag/friend t/01`
 Expected result:
 * The selected person's displayed fields are updated.
 * The Result Display confirms the edited person.
