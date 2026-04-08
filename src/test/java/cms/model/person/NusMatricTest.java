@@ -61,14 +61,37 @@ public class NusMatricTest {
     @Test
     public void constructor_rejectsInvalidInputs() {
         // invalid nus ids
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567")); // missing last letter
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567BB")); // extra trailing letter
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("B0234567B")); // must start with A or U
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567  B")); // internal spaces not allowed
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567$")); // invalid trailing character
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567B")); // wrong checksum
+        IllegalArgumentException missingLastLetter =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, missingLastLetter.getMessage()); // missing last letter
+
+        IllegalArgumentException extraTrailingLetter =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567BB"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, extraTrailingLetter.getMessage()); // extra trailing letter
+
+        IllegalArgumentException invalidPrefix =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("B0234567B"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, invalidPrefix.getMessage()); // must start with A or U
+
+        IllegalArgumentException internalSpaces =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567  B"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, internalSpaces.getMessage()); // spaces not allowed
+
+        IllegalArgumentException invalidTrailingCharacter =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567$"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, invalidTrailingCharacter.getMessage());
+
+        IllegalArgumentException wrongChecksum =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("A0234567B"));
+        assertEquals(NusMatric.MESSAGE_CHECKSUM_CONSTRAINTS, wrongChecksum.getMessage());
+
         // legacy U format should have 6 digits
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("U0234567B"));
-        assertThrows(IllegalArgumentException.class, () -> new NusMatric("U0906931"));
+        IllegalArgumentException invalidU7Format =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("U0234567B"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, invalidU7Format.getMessage());
+
+        IllegalArgumentException legacyUFormat =
+            assertThrows(IllegalArgumentException.class, () -> new NusMatric("U0906931"));
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, legacyUFormat.getMessage());
     }
 }

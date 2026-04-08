@@ -9,6 +9,7 @@ import static cms.logic.commands.CommandTestUtil.INVALID_EMAIL_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_GITHUBUSERNAME_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_NAME_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_NUSMATRIC_DESC;
+import static cms.logic.commands.CommandTestUtil.INVALID_NUSMATRIC_FORMAT_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_PHONE_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_ROLE_DESC;
 import static cms.logic.commands.CommandTestUtil.INVALID_SOCUSERNAME_DESC;
@@ -230,10 +231,17 @@ public class AddCommandParserTest {
                 + GITHUBUSERNAME_DESC_BOB + PHONE_DESC_BOB + INVALID_EMAIL_DESC
                 + TUTORIALGROUP_DESC_BOB + TAG_DESC_HUSBAND + TAG_DESC_FRIEND, Email.MESSAGE_CONSTRAINTS);
 
-        // invalid NUS Matric
+        // invalid NUS Matric checksum
         assertParseFailure(parser, NAME_DESC_BOB + INVALID_NUSMATRIC_DESC + ROLE_DESC_BOB + SOCUSERNAME_DESC_BOB
                 + GITHUBUSERNAME_DESC_BOB + PHONE_DESC_BOB + EMAIL_DESC_BOB
-                + TUTORIALGROUP_DESC_BOB + TAG_DESC_HUSBAND + TAG_DESC_FRIEND, NusMatric.MESSAGE_CONSTRAINTS);
+                + TUTORIALGROUP_DESC_BOB + TAG_DESC_HUSBAND + TAG_DESC_FRIEND,
+                NusMatric.MESSAGE_CHECKSUM_CONSTRAINTS);
+
+        // invalid NUS Matric format
+        assertParseFailure(parser, NAME_DESC_BOB + INVALID_NUSMATRIC_FORMAT_DESC + ROLE_DESC_BOB + SOCUSERNAME_DESC_BOB
+                + GITHUBUSERNAME_DESC_BOB + PHONE_DESC_BOB + EMAIL_DESC_BOB
+                + TUTORIALGROUP_DESC_BOB + TAG_DESC_HUSBAND + TAG_DESC_FRIEND,
+                NusMatric.MESSAGE_FORMAT_CONSTRAINTS);
 
         // invalid SOC username
         assertParseFailure(parser, NAME_DESC_BOB + NUSMATRIC_DESC_BOB + ROLE_DESC_BOB + INVALID_SOCUSERNAME_DESC

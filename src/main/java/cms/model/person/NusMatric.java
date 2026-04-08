@@ -9,9 +9,11 @@ import static java.util.Objects.requireNonNull;
  */
 public class NusMatric {
 
-    public static final String MESSAGE_CONSTRAINTS =
-            "NUS Matric must be in the format A#######X or U######X with a valid checksum, where # is a digit "
-                + "and X is a letter (e.g., A0234567X or U023456W).";
+    public static final String MESSAGE_FORMAT_CONSTRAINTS =
+        "NUS Matric must be in the format A#######X or U######X, where # is a digit "
+            + "and X is a letter (e.g., A0234567X or U023456W).";
+    public static final String MESSAGE_CHECKSUM_CONSTRAINTS =
+        "NUS Matric has an invalid checksum. Please check the matric number carefully.";
     public static final String VALIDATION_REGEX = "(A\\d{7}|U\\d{6})[A-Z]";
 
     private static final String CHECK_DIGIT_TABLE = "YXWURNMLJHEAB";
@@ -28,7 +30,8 @@ public class NusMatric {
     public NusMatric(String nusMatric) {
         requireNonNull(nusMatric);
         String canonical = canonicalise(nusMatric);
-        checkArgument(isValidNusMatric(canonical), MESSAGE_CONSTRAINTS);
+        String validationError = getValidationErrorMessage(canonical);
+        checkArgument(validationError == null, validationError);
         value = canonical;
     }
 
@@ -46,15 +49,28 @@ public class NusMatric {
      * Returns true if a given string is a valid NUS Matric.
      */
     public static boolean isValidNusMatric(String test) {
+        return getValidationErrorMessage(test) == null;
+    }
+
+    /**
+     * Returns the validation error message for the given NUS Matric, or null if valid.
+     */
+    public static String getValidationErrorMessage(String test) {
         if (test == null) {
-            return false;
+            return MESSAGE_FORMAT_CONSTRAINTS;
         }
         String canonical = canonicalise(test);
-        if (!canonical.matches(VALIDATION_REGEX)) {
-            return false;
+        if (!isValidFormat(canonical)) {
+            return MESSAGE_FORMAT_CONSTRAINTS;
         }
+        if (!hasValidChecksum(canonical)) {
+            return MESSAGE_CHECKSUM_CONSTRAINTS;
+        }
+        return null;
+    }
 
-        return hasValidChecksum(canonical);
+    private static boolean isValidFormat(String canonical) {
+        return canonical.matches(VALIDATION_REGEX);
     }
 
     private static boolean hasValidChecksum(String canonical) {

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import cms.commons.exceptions.IllegalValueException;
 import cms.model.person.Email;
 import cms.model.person.Name;
+import cms.model.person.NusMatric;
 import cms.model.person.Person;
 import cms.model.person.Phone;
 
@@ -22,6 +23,8 @@ public class JsonAdaptedPersonTest {
     private static final String INVALID_NAME = "R@chel";
     private static final String INVALID_PHONE = "+651234";
     private static final String INVALID_EMAIL = "example.com";
+    private static final String INVALID_NUSMATRIC_FORMAT = "A0234567";
+    private static final String INVALID_NUSMATRIC_CHECKSUM = "A0234567A";
     private static final String INVALID_SOCUSERNAME_NUSMATRIC_MISMATCH = "a9999999w";
     private static final String INVALID_TAG = "#friend";
 
@@ -103,6 +106,24 @@ public class JsonAdaptedPersonTest {
             VALID_NUSMATRIC, VALID_SOCUSERNAME, VALID_GITHUBUSERNAME,
                 VALID_ROLE, VALID_TUTORIALGROUP, VALID_TAGS);
         String expectedMessage = Email.MESSAGE_CONSTRAINTS;
+        assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidNusMatricFormat_throwsIllegalValueException() {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL,
+                INVALID_NUSMATRIC_FORMAT, VALID_SOCUSERNAME, VALID_GITHUBUSERNAME,
+                VALID_ROLE, VALID_TUTORIALGROUP, VALID_TAGS);
+        String expectedMessage = NusMatric.MESSAGE_FORMAT_CONSTRAINTS;
+        assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
+    }
+
+    @Test
+    public void toModelType_invalidNusMatricChecksum_throwsIllegalValueException() {
+        JsonAdaptedPerson person = new JsonAdaptedPerson(VALID_NAME, VALID_PHONE, VALID_EMAIL,
+                INVALID_NUSMATRIC_CHECKSUM, VALID_SOCUSERNAME, VALID_GITHUBUSERNAME,
+                VALID_ROLE, VALID_TUTORIALGROUP, VALID_TAGS);
+        String expectedMessage = NusMatric.MESSAGE_CHECKSUM_CONSTRAINTS;
         assertThrows(IllegalValueException.class, expectedMessage, person::toModelType);
     }
 
