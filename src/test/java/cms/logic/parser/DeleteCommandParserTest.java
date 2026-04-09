@@ -7,7 +7,11 @@ import static cms.logic.parser.CommandParserTestUtil.assertParseFailure;
 import static cms.logic.parser.CommandParserTestUtil.assertParseSuccess;
 import static cms.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 import static cms.testutil.TypicalIndexes.INDEX_SECOND_PERSON;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -68,5 +72,17 @@ public class DeleteCommandParserTest {
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
         assertParseFailure(parser, "1 m/" + VALID_NUSMATRIC_AMY,
                 String.format(MESSAGE_INVALID_COMMAND_FORMAT, DeleteCommand.MESSAGE_USAGE));
+    }
+
+    @Test
+    public void parseNusMatricTokens_noMatricValues_throwsParseException() throws Exception {
+        Method parseNusMatricTokens =
+                DeleteCommandParser.class.getDeclaredMethod("parseNusMatricTokens", ArgumentMultimap.class);
+        parseNusMatricTokens.setAccessible(true);
+
+        InvocationTargetException exception = assertThrows(InvocationTargetException.class,
+                () -> parseNusMatricTokens.invoke(parser, new ArgumentMultimap()));
+
+        assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, exception.getCause().getMessage());
     }
 }
