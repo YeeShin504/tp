@@ -217,15 +217,17 @@ Existing files are overwritten during export.
 NUS matriculation number validation ensures that CMS accepts only canonical NUS-style identifiers with valid check digits, preventing malformed or mistyped identifiers from entering the model.
 Instead of scattering validation rules across parsers and storage classes, CMS centralises the logic in `NusMatric` so that all entry points enforce the same format and checksum rules.
 
-NUS matriculation number validation works as follows:
+Validation through command parsing works as follows:
 
 1. A command parser such as `AddCommandParser`, `EditCommandParser`, `DeleteCommandParser`, `FindCommandParser`, or `TagCommandParser` delegates matric parsing to `ParserUtil#parseNusMatric(...)` or `ParserUtil#parseNusMatrics(...)`.
 2. `ParserUtil` trims the raw input and calls `NusMatric#getValidationErrorMessage(...)`.
 3. `NusMatric` canonicalises the input by trimming surrounding whitespace and converting it to uppercase.
 4. `NusMatric` validates the canonical form against the accepted patterns `A#######X` and `U######X`, where `#` is a digit and `X` is a letter.
 5. If the format is valid, `NusMatric` computes the expected check digit using the numeric portion of the matric number, prefix-specific weights, modulo 13, and a fixed check-digit lookup table.
-6. If the computed check digit matches the provided trailing letter, a `NusMatric` object is constructed; otherwise, parsing fails with a checksum-specific error message.
-7. During JSON import, `JsonAdaptedPerson#toModelType()` calls the same validation method before constructing the imported `Person`, so imported records and interactive command input follow the same rules.
+6. If the computed check digit matches the provided trailing letter, `ParserUtil` constructs a `NusMatric` object; otherwise, parsing fails with a checksum-specific error message.
+
+Validation during JSON import follows a separate entry path.
+`JsonAdaptedPerson#toModelType()` calls `NusMatric#getValidationErrorMessage(...)` before constructing the imported `NusMatric` object, so imported records and interactive command input follow the same format, canonicalisation, and checksum rules.
 
 Because validation is performed before model objects are created, malformed or checksum-invalid matric numbers are rejected early and never enter the address book state.
 The implementation also canonicalises accepted values into uppercase form, which ensures consistent storage, comparison, and duplicate detection.
