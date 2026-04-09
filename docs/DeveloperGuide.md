@@ -153,7 +153,18 @@ Classes used by multiple components are in the `cms.commons` package.
 
 This section describes the current CMS implementation at a high level. The command flow, component responsibilities, and diagrams above reflect the existing architecture and supported command-based workflow.
 
-<<<<<<< mask-developer-guide
+### Import and export features
+
+The `import` and `export` features are implemented by [`ImportCommandParser`](../src/main/java/cms/logic/parser/ImportCommandParser.java), [`ImportCommand`](../src/main/java/cms/logic/commands/ImportCommand.java), [`ExportCommandParser`](../src/main/java/cms/logic/parser/ExportCommandParser.java), and [`ExportCommand`](../src/main/java/cms/logic/commands/ExportCommand.java).
+
+`ImportCommandParser` requires the file path to be wrapped in double quotes and to end with `.json`. After validating the path, the parser extracts the optional keep policy token (`keep/current` or `keep/incoming`). If the current data is non-empty and no keep policy is provided, the command is rejected with usage guidance.
+
+During execution, `ImportCommand` delegates file reading and deserialization to the storage layer, then merges the imported records into the model using the chosen keep policy. Conflicts are resolved according to the selected policy, while invalid file paths, unsupported file extensions, invalid JSON content, and malformed records are reported as command errors.
+
+`ExportCommandParser` also requires the file path to be wrapped in double quotes and to end with `.json`. Once validated, `ExportCommand` asks the storage layer to serialize the current model state and write it to the requested file path.
+
+Existing files are overwritten. Invalid file paths, unsupported file extensions, and write failures are reported as command errors.
+
 ### Masking sensitive fields
 
 #### Implementation
@@ -190,7 +201,6 @@ Because the masking state is stored in `UserPrefs`, it is restored on startup an
   * Pros: Keeps the feature local to presentation code.
   * Cons: The list panel and detail panel would need separate coordination, and the preference would not naturally persist across restarts.
 
-=======
 ### Find feature
 
 The `find` feature is implemented by [`FindCommandParser`](../src/main/java/cms/logic/parser/FindCommandParser.java)
@@ -246,7 +256,6 @@ updates each matching `Person` by creating a replacement `Person` object with th
 immutability assumptions used by the model layer. For `add`, tags are merged into the existing set. For `delete`, only
 the requested tags are removed. If no effective change occurs, the command returns a no-op message instead of silently
 reporting success.
->>>>>>> master
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, configuration, dev-ops**
@@ -558,24 +567,24 @@ testers are expected to do more *exploratory* testing.
 
 1. Export current data
 
-   1. Test case: `export data/manual-test-export.json`<br>
+   1. Test case: `export "data/manual-test-export.json"`<br>
       Expected: Command succeeds and creates/overwrites `data/manual-test-export.json`.
 
-   1. Incorrect command to try: `export data/manual-test-export.txt`<br>
+   1. Incorrect command to try: `export "data/manual-test-export.txt"`<br>
       Expected: Command is rejected because file path must end with `.json`.
 
 1. Import data with and without keep policy
 
    1. Prerequisites: Use the exported file from the previous test.
 
-   1. Test case: `import data/manual-test-export.json` (when current data is non-empty)<br>
+   1. Test case: `import "data/manual-test-export.json"` (when current data is non-empty)<br>
       Expected: Command is rejected and asks for `keep/current` or `keep/incoming`.
 
-   1. Test case: `import data/manual-test-export.json keep/current`<br>
+   1. Test case: `import "data/manual-test-export.json" keep/current`<br>
       Expected: Command succeeds and keeps existing records where conflicts occur.
 
-   1. Test case: `import data/manual-test-export.json keep/incoming`<br>
+   1. Test case: `import "data/manual-test-export.json" keep/incoming`<br>
       Expected: Command succeeds and incoming records replace existing conflicting records.
 
-   1. Incorrect command to try: `import data/manual-test-export.txt`<br>
+   1. Incorrect command to try: `import "data/manual-test-export.txt"`<br>
       Expected: Command is rejected because file path must end with `.json`.
