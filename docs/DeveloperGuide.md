@@ -153,6 +153,42 @@ Classes used by multiple components are in the `cms.commons` package.
 
 This section describes the current CMS implementation at a high level. The command flow, component responsibilities, and diagrams above reflect the existing architecture and supported command-based workflow.
 
+### Masking sensitive fields
+
+#### Implementation
+
+The masking feature lets course coordinators hide sensitive fields in the UI without changing the underlying `Person` data.
+Instead of rewriting stored records, CMS keeps a single masking preference in `UserPrefs` and routes it through the `Model` interface.
+
+The `mask` command works as follows:
+
+1. `LogicManager` receives the user input and forwards it to `AddressBookParser`.
+2. `AddressBookParser` creates `MaskCommandParser`, which returns a `MaskCommand`.
+3. `MaskCommand#execute(Model)` calls `Model#setMasked(true)`.
+4. `ModelManager` updates the `isMasked` flag stored in `UserPrefs`.
+5. After command execution succeeds, `MainWindow#refreshPersonListPanel(...)` rebuilds the list and detail panels using `logic.isMasked()`.
+6. `PersonCard` and `PersonDetailPanel` use `MaskingUtil` to render masked values while the underlying `Person` objects remain unchanged.
+
+The following sequence diagram shows the flow for `mask` and `unmask`:
+
+![MaskUnmaskSequenceDiagram](images/MaskUnmaskSequenceDiagram.png)
+
+`unmask` follows the same flow, except that `UnmaskCommand#execute(Model)` calls `Model#setMasked(false)`.
+
+Because the masking state is stored in `UserPrefs`, it is restored on startup and saved when preferences are written on normal shutdown.
+
+#### Design considerations
+
+**Aspect: Where to store masking state**
+
+* **Alternative 1 (current choice):** Store the masking flag in `UserPrefs` and expose it through `Model`.
+  * Pros: Keeps a single source of truth for both commands and UI, and allows the preference to persist across sessions.
+  * Cons: Since masking does not modify any `Person` objects, the UI must explicitly refresh after the command to repaint masked values.
+
+* **Alternative 2:** Store the masking state only inside UI classes.
+  * Pros: Keeps the feature local to presentation code.
+  * Cons: The list panel and detail panel would need separate coordination, and the preference would not naturally persist across restarts.
+
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, configuration, dev-ops**
