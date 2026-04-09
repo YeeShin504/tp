@@ -39,7 +39,7 @@ public class DeleteCommandParser implements Parser<DeleteCommand> {
     private List<String> parseNusMatricTokens(String trimmedArgs) throws ParseException {
         String nusMatricArgs = trimmedArgs.substring(2).trim();
         if (nusMatricArgs.isEmpty()) {
-            throw new ParseException(NusMatric.MESSAGE_CONSTRAINTS);
+            throw new ParseException(NusMatric.MESSAGE_FORMAT_CONSTRAINTS);
         }
 
         String[] tokens = nusMatricArgs.split("\\s+(?:m/\\s*)?|\\s*m/\\s*");

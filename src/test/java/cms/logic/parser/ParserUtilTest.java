@@ -69,7 +69,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseNusMatrics_emptyInput_throwsParseException() {
-        assertThrows(ParseException.class, NusMatric.MESSAGE_CONSTRAINTS, () ->
+        assertThrows(ParseException.class, NusMatric.MESSAGE_FORMAT_CONSTRAINTS, () ->
                 ParserUtil.parseNusMatrics(Collections.emptyList()));
     }
 
@@ -77,6 +77,18 @@ public class ParserUtilTest {
     public void parseNusMatrics_validInput_success() throws Exception {
         assertEquals(List.of(new NusMatric("A0123456J"), new NusMatric("A0234567X")),
                 ParserUtil.parseNusMatrics(List.of("A0123456J", "A0234567X")));
+    }
+
+    @Test
+    public void parseNusMatric_invalidFormat_throwsParseException() {
+        assertThrows(ParseException.class, NusMatric.MESSAGE_FORMAT_CONSTRAINTS, () ->
+            ParserUtil.parseNusMatric("A0234567"));
+    }
+
+    @Test
+    public void parseNusMatric_invalidChecksum_throwsParseException() {
+        assertThrows(ParseException.class, NusMatric.MESSAGE_CHECKSUM_CONSTRAINTS, () ->
+            ParserUtil.parseNusMatric("A0234567A"));
     }
 
     @Test

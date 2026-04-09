@@ -122,8 +122,9 @@ class JsonAdaptedPerson {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT,
                     NusMatric.class.getSimpleName()));
         }
-        if (!NusMatric.isValidNusMatric(nusMatric)) {
-            throw new IllegalValueException(NusMatric.MESSAGE_CONSTRAINTS);
+        String nusMatricValidationError = NusMatric.getValidationErrorMessage(nusMatric);
+        if (nusMatricValidationError != null) {
+            throw new IllegalValueException(nusMatricValidationError);
         }
         final NusMatric modelNusMatric = new NusMatric(nusMatric);
 

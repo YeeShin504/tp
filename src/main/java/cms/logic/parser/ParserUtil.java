@@ -70,7 +70,7 @@ public class ParserUtil {
     public static List<NusMatric> parseNusMatrics(Collection<String> nusMatrics) throws ParseException {
         requireNonNull(nusMatrics);
         if (nusMatrics.isEmpty()) {
-            throw new ParseException(NusMatric.MESSAGE_CONSTRAINTS);
+            throw new ParseException(NusMatric.MESSAGE_FORMAT_CONSTRAINTS);
         }
 
         List<NusMatric> parsedNusMatrics = new ArrayList<>();
@@ -170,8 +170,9 @@ public class ParserUtil {
     public static NusMatric parseNusMatric(String nusMatric) throws ParseException {
         requireNonNull(nusMatric);
         String trimmedNusMatric = nusMatric.trim();
-        if (!NusMatric.isValidNusMatric(trimmedNusMatric)) {
-            throw new ParseException(NusMatric.MESSAGE_CONSTRAINTS);
+        String validationError = NusMatric.getValidationErrorMessage(trimmedNusMatric);
+        if (validationError != null) {
+            throw new ParseException(validationError);
         }
         return new NusMatric(trimmedNusMatric);
     }
