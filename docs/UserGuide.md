@@ -114,7 +114,7 @@ Adds a student or tutor record to CMS.
 **Constraints:**
 * `n/`, `m/`, `soc/`, `gh/`, `e/`, `p/`, and `t/` are mandatory.
 * All field values must satisfy the rules in [Fields and accepted formats](#fields-and-accepted-formats).
-* Fields that must be unique cannot duplicate an existing person.
+* `m/`, `soc/`, `gh/`, and `e/` must be unique and cannot duplicate an existing person.
 * If `role/` is omitted, the role defaults to `student`.
 
 **Examples:**
@@ -473,6 +473,7 @@ Use this section as a quick checklist when adding or editing command examples an
 <a id="field-email"></a>
 **`e/EMAIL`**
 * Must be a valid email format.
+* Must be unique in CMS.
 * Case sensitivity: case-insensitive input (stored in lowercase).
 * Valid: `e/johndoe@u.nus.edu`
 * Invalid: `e/johndoe@u`
