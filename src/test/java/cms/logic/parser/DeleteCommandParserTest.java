@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import cms.logic.commands.DeleteCommand;
 import cms.model.person.NusMatric;
@@ -79,9 +80,10 @@ public class DeleteCommandParserTest {
         Method parseNusMatricTokens =
                 DeleteCommandParser.class.getDeclaredMethod("parseNusMatricTokens", ArgumentMultimap.class);
         parseNusMatricTokens.setAccessible(true);
+        Executable parseWithoutMatricValues = () -> parseNusMatricTokens.invoke(parser, new ArgumentMultimap());
 
-        InvocationTargetException exception = assertThrows(InvocationTargetException.class,
-                () -> parseNusMatricTokens.invoke(parser, new ArgumentMultimap()));
+        InvocationTargetException exception =
+                assertThrows(InvocationTargetException.class, parseWithoutMatricValues);
 
         assertEquals(NusMatric.MESSAGE_FORMAT_CONSTRAINTS, exception.getCause().getMessage());
     }
