@@ -201,7 +201,7 @@ The `import` and `export` commands work as follows:
 1. `LogicManager` receives the user input and forwards it to `AddressBookParser`.
 2. `AddressBookParser` creates either `ImportCommandParser` or `ExportCommandParser`.
 3. `ImportCommandParser` or `ExportCommandParser` validates that the file path is wrapped in double quotes and ends with `.json`.
-4. For `import`, `ImportCommandParser` also extracts the optional keep policy token (`keep/current` or `keep/incoming`), and rejects the command with usage guidance if current data is non-empty and no keep policy is given.
+4. For `import`, `ImportCommandParser` also extracts the optional keep policy token (`keep/current` or `keep/incoming`), and `ImportCommand#execute` rejects the command with usage guidance if current data is non-empty and no keep policy is given.
 5. `ImportCommand#execute(Model, Storage)` asks the storage layer to read and deserialize the target JSON file into model-compatible records.
 6. Imported persons are merged into the model according to the selected keep policy, with conflicts resolved in favor of either the current record or the incoming record.
 7. `ExportCommand#execute(Model, Storage)` asks the storage layer to serialize the current model state and write it to the target JSON file.
