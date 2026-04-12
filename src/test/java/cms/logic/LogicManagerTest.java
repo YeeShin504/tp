@@ -480,6 +480,33 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void executeImportKeepIncomingAmbiguousConflictThrowsCommandException()
+            throws Exception {
+        Person existingPersonOne = new PersonBuilder(ALICE).build();
+        Person existingPersonTwo = new PersonBuilder(BENSON).build();
+        model.addPerson(existingPersonOne);
+        model.addPerson(existingPersonTwo);
+
+        Person ambiguousIncomingPerson = new PersonBuilder(CARL)
+                .withEmail(existingPersonOne.getEmail().toString())
+                .withSocUsername(existingPersonTwo.getSocUsername().toString())
+                .build();
+        Path importPath = createImportFileWithSinglePerson(ambiguousIncomingPerson);
+        String importCommand = buildImportCommand(importPath.toAbsolutePath().normalize(), "keep/incoming");
+
+        CommandException thrownException = org.junit.jupiter.api.Assertions.assertThrows(
+                CommandException.class, () -> logic.execute(importCommand));
+        assertTrue(thrownException.getMessage().contains("conflicts with multiple current persons"));
+        assertTrue(thrownException.getMessage().contains(existingPersonOne.getName().toString()));
+        assertTrue(thrownException.getMessage().contains(existingPersonTwo.getName().toString()));
+        assertTrue(thrownException.getMessage().contains("by email"));
+        assertTrue(thrownException.getMessage().contains("by SOC username"));
+        assertTrue(model.getFilteredPersonList().contains(existingPersonOne));
+        assertTrue(model.getFilteredPersonList().contains(existingPersonTwo));
+        assertEquals(2, model.getFilteredPersonList().size());
+    }
+
+    @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredPersonList().remove(0));
     }

@@ -56,6 +56,10 @@ public class ImportCommand extends Command {
             "incoming '%s' conflicts with current '%s' by NUS Matric (%s)";
     public static final String MESSAGE_FIELD_CONFLICT_FORMAT =
             "incoming '%s' conflicts with current '%s' by %s (%s)";
+    public static final String MESSAGE_MULTIPLE_CONFLICTS_FORMAT =
+            "Import aborted: incoming '%s' conflicts with multiple current persons (%d). "
+            + "Please resolve conflicts manually before using keep/incoming.";
+    private static final String MESSAGE_MULTIPLE_CONFLICTS_DETAILS_HEADER = "\nConflicting entries:";
     private static final String MESSAGE_CONFLICT_PREVIEW_HEADER = "\nConflicting entries detected:";
     private static final int CONFLICT_PREVIEW_LIMIT = 5;
 
@@ -126,6 +130,10 @@ public class ImportCommand extends Command {
 
             if (keepPolicy == KeepPolicy.CURRENT) {
                 continue;
+            }
+
+            if (conflictingPersons.size() > 1) {
+                throw new CommandException(buildMultipleConflictsMessage(incomingPerson, conflictingPersons));
             }
 
             for (Person conflictingPerson : conflictingPersons) {
@@ -207,6 +215,19 @@ public class ImportCommand extends Command {
         return String.format(MESSAGE_FIELD_CONFLICT_FORMAT,
                 incomingPerson.getName(), existingPerson.getName(),
                 fieldConflict.getFieldName(), fieldConflict.getFieldValue());
+    }
+
+    private String buildMultipleConflictsMessage(Person incomingPerson, List<Person> conflictingPersons) {
+        StringBuilder details = new StringBuilder(String.format(
+                MESSAGE_MULTIPLE_CONFLICTS_FORMAT, incomingPerson.getName(), conflictingPersons.size()));
+        details.append(MESSAGE_MULTIPLE_CONFLICTS_DETAILS_HEADER);
+        for (Person conflictingPerson : conflictingPersons) {
+            String conflictDescription = getConflictDescription(incomingPerson, conflictingPerson);
+            if (conflictDescription != null) {
+                details.append("\n- ").append(conflictDescription);
+            }
+        }
+        return details.toString();
     }
 
     public Path getImportFilePath() {
