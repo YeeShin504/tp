@@ -236,6 +236,10 @@ Adds or removes one or more tags from one or more persons.
 **Expected result:**
 * The selected persons' tags are updated.
 * The Result Display confirms the tag operation.
+* If `tag delete` does not find any of the specified tags on the targeted persons, no changes are made and the Result Display shows `No specified tags were removed from the targeted persons.`
+
+Example: if person `id/3` has no `python` tag, running `tag delete id/3 tag/python` shows
+`No specified tags were removed from the targeted persons.`
 
 ### Filtering students / tutors : `filter`
 
