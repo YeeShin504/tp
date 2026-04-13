@@ -287,7 +287,7 @@ For both `import` and `export` commands:
 * Platform path separators such as `/` and `\` are accepted.
 * The file name must end with `.json`.
 * Do not include double quotes (`"`) in the path.
-* Avoid characters that are invalid in file names on your operating system, such as `#`, `%`, `?`, `*`, `<`, `>`, or `|`.
+* Avoid characters that are invalid in file names on your operating system (allowed characters may differ by platform).
 
 **Valid examples:**
 * `export "data/backup.json"`
@@ -299,8 +299,6 @@ For both `import` and `export` commands:
    Missing the required double quotes.
 * `export "data/backup.txt"`<br>
    The file name must end with `.json`.
-* `export "data/backup?.json"`<br>
-   `?` is not a valid file-name character.
 
 ### Importing records from a JSON file : `import`
 
