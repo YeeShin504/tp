@@ -3,7 +3,7 @@ layout: page
 title: User Guide
 ---
 
-Managing large cohorts with point-and-click workflows is slow, repetitive, and prone to mistakes, especially when student and tutor records must stay consistent. Course Management System (CMS) is built for NUS course coordinators who need speed and accuracy: a command-driven workflow with built-in validation and uniqueness checks that helps you complete routine record tasks in seconds with confidence.
+Are you spending too much time switching between spreadsheets, portals, and notes just to keep course records up to date? Course Management System (CMS) is designed for NUS SoC course coordinators who manage high-volume student and tutor data each term. If you are a fast typist, CMS helps you filter, update, and organize records quickly through straightforward commands, backed by a clean visual interface. No advanced technical background is required beyond basic computer skills.
 
 * Table of Contents
 {:toc}
@@ -79,14 +79,14 @@ Action | Format
 
 **:information_source: Notes about command format:**<br>
 
-* A command has a command word plus fields.
-* Command word: `add`, `edit`, `find`, ...
+* A command must begin with a command word followed by fields if required.
+* Examples of command word: `add`, `edit`, `find`, ...
 * Prefixes identify each field, e.g. `n/`, `m/`, `e/`.
 * `/` is reserved for prefixes and cannot appear in any field value.
-* Words in `UPPER_CASE` are values to provide.
+* Words in `UPPER_CASE` are values to be provided.
 * Items in square brackets are optional.
 * `...` means the field can be repeated.
-* Parameters can be in any order.
+* Parameters may appear in any order.
 * For commands without parameters (`list`, `mask`, `unmask`, `exit`), extra text does not block execution and is reported as ignored.
 * e.g. `add n/John Doe m/A0234567X role/tutor soc/johndoe gh/johndoe e/johndoe@u.nus.edu p/91234567 t/01 tag/mentor`
 </div>
@@ -436,11 +436,12 @@ Use this section as a quick checklist when adding or editing command examples an
 **`n/NAME`**
 * 1 to 128 characters and must include at least one letter.
 * Allowed characters: letters, spaces, hyphens (`-`), apostrophes (`'`), and periods (`.`).
-* Cannot be blank.
-* Consecutive spaces are collapsed. E.g. `n/John   Doe` is treated as `n/John Doe`.
+* Consecutive spaces are collapsed. E.g. `n/John ​ ​ Doe` is treated as `n/John Doe`.
 * Case sensitivity: case-sensitive (stored as entered after space normalization).
 * Valid: `n/John Doe`
-* Invalid: `n/Ravi s/o Kumar`
+* Invalid:
+    * `n/Ravi s/o Kumar` due to `/` in `s/o`. Use `n/Ravi s-o Kumar` instead.
+    * `n/José` due to diacritics `é`. Use `n/Jose` instead.
 
 <a id="field-nus-matric"></a>
 **`m/NUS_MATRIC`**
@@ -520,19 +521,17 @@ Use this section as a quick checklist when adding or editing command examples an
 
 ## Glossary
 
-**CLI**: Command Line Interface used to control CMS by typing commands.
-
 **Command word**: The action keyword at the start of a command, e.g. `add`, `find`, `help`.
 
 **Field**: A value supplied with a prefix in a command, e.g. `n/John Doe`.
 
 **Prefix**: A marker that indicates what a field means, e.g. `n/`, `m/`, `e/`.
 
-**INDEX**: A 1-based position of a person in the currently displayed list.
+**Index**: A 1-based position of a person in the currently displayed list.
 
 **NUS Matric**: Identifier given by NUS in checksum-validated format `A` + 7 digits + a letter (e.g., `A0234567X`) or `U` + 6 digits + a letter (e.g., `U023456W`).
 
-**SoC username**: School of Computing account username stored in the `soc/` field.
+**SoC username**: SoC Unix account username stored in the `soc/` field.
 
 **Tutorial group**: Class/tutorial group number in the `t/` field.
 
