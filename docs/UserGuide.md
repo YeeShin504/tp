@@ -452,12 +452,12 @@ Use this section as a quick checklist when adding or editing command examples an
 **`n/NAME`**
 * 1 to 128 characters and must include at least one letter.
 * Allowed characters: letters, spaces, hyphens (`-`), apostrophes (`'`), and periods (`.`).
-* Consecutive spaces are collapsed. E.g. `n/John ​ ​ Doe` is treated as `n/John Doe`.
+* Consecutive spaces are collapsed. E.g. `n/John â€‹ â€‹ Doe` is treated as `n/John Doe`.
 * Case sensitivity: case-sensitive (stored as entered after space normalization).
 * Valid: `n/John Doe`
 * Invalid:
     * `n/Ravi s/o Kumar` due to `/` in `s/o`. Use `n/Ravi s-o Kumar` instead.
-    * `n/José` due to diacritics `é`. Use `n/Jose` instead.
+    * `n/JosÃ©` due to diacritics `Ã©`. Use `n/Jose` instead.
 
 <a id="field-nus-matric"></a>
 **`m/NUS_MATRIC`**
@@ -560,6 +560,22 @@ Use this section as a quick checklist when adding or editing command examples an
 ## Known issues
 
 1. **If the Help Window is minimized**, triggering help again may keep it minimized on some Unix-based systems, and requires you to manually restore it.
+
+--------------------------------------------------------------------------------------------------------------------
+
+## Planned Enhancements
+
+**Team size: 5**
+
+1. **Improve sorting within tutorial groups**: When sorting by tutorial group, persons in the same group are not given a useful secondary ordering. We plan to add a consistent secondary sort key so that members of the same tutorial group appear in a predictable order.
+2. **Improve the Help Window UI**: The current Help Window has known usability and display issues. We plan to refine the existing Help Window layout so that help content is easier to read and interact with.
+3. **Support diacritics in names**: The current name field does not accept names containing diacritical marks. We plan to allow valid names with diacritics, such as `Jose` with an accented `e`.
+4. **Correct NUS matric checksum validation for `A` series matric numbers**: The current checksum logic does not include the first digit for `A` series matrics. We plan to update the existing validation logic so these matrics are checked correctly.
+5. **Fix `export` path parsing inconsistency on Linux**: The command `export "test.json\" \"output.json"` currently succeeds on Linux when it should be rejected as invalid input. We plan to make path parsing stricter and consistent across platforms.
+6. **Make import feedback more specific for duplicates**: The current import feedback does not clearly distinguish between successfully imported entries and entries skipped due to duplication. We plan to make the existing import message explicitly report unique and duplicate records.
+7. **Improve `tag delete` feedback after filtered-list operations**: The current success message may show an index that does not match the filtered list index used by the user. We plan to make `tag delete` feedback use the filtered-list index consistently, or omit the index when it may be misleading.
+8. **Improve large dataset rendering**: The current UI may not scale smoothly when handling large amounts of data. We plan to improve the existing rendering approach to support larger datasets more efficiently through proper pagination or dynamic rendering.
+9. **Improve empty-list state feedback**: When the displayed list is empty, some UI guidance and command results remain too generic. We plan to replace empty-state prompts such as `Select a person from the list to view their full profile.` with messaging that reflects the empty list, and make commands such as `sort` and `find` return feedback that explicitly states when there are no persons currently available or no displayed persons to act on.
 
 --------------------------------------------------------------------------------------------------------------------
 
