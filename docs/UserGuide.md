@@ -540,13 +540,6 @@ Use this section as a quick checklist when adding or editing command examples an
 
 --------------------------------------------------------------------------------------------------------------------
 
-## Known issues
-
-1. **When using multiple screens**, if you move the app to a secondary screen and later switch to one screen, the GUI may open off-screen. Delete `preferences.json` before starting again.
-2. **If the Help Window is minimized**, triggering help again may keep it minimized, and requires you to manually restore it.
-
---------------------------------------------------------------------------------------------------------------------
-
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
