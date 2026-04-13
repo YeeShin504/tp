@@ -540,6 +540,12 @@ Use this section as a quick checklist when adding or editing command examples an
 
 --------------------------------------------------------------------------------------------------------------------
 
+## Known issues
+
+1. **If the Help Window is minimized**, triggering help again may keep it minimized on some Unix-based systems, and requires you to manually restore it.
+
+--------------------------------------------------------------------------------------------------------------------
+
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
