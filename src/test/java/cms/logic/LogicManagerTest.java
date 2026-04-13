@@ -335,6 +335,30 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void executeImportCommandInvalidDataWithEmptyIllegalValueMessageShowsGenericMessage() {
+        Path prefPath = temporaryFolder.resolve("addressBook.json");
+
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(prefPath) {
+            @Override
+            public Optional<ReadOnlyAddressBook> readAddressBook(Path filePath) throws DataLoadingException {
+                throw new DataLoadingException(new IllegalValueException(""));
+            }
+        };
+
+        JsonUserPrefsStorage userPrefsStorage =
+                new JsonUserPrefsStorage(temporaryFolder.resolve("ExceptionUserPrefs.json"));
+        StorageManager storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        logic = new LogicManager(model, storage);
+
+        Path importPath = temporaryFolder.resolve("imports").resolve("invalid.json");
+        String importCommand = ImportCommand.COMMAND_WORD + " \"" + importPath + "\"";
+
+        CommandException thrownException = org.junit.jupiter.api.Assertions.assertThrows(
+                CommandException.class, () -> logic.execute(importCommand));
+        assertEquals(ImportCommand.MESSAGE_INVALID_DATA, thrownException.getMessage());
+    }
+
+    @Test
     public void execute_importCommandWithCurrentDataAndNoKeep_throwsCommandException() throws Exception {
         logic.execute(AddCommand.COMMAND_WORD + NAME_DESC_AMY + NUSMATRIC_DESC_AMY + ROLE_DESC_AMY
                 + SOCUSERNAME_DESC_AMY + GITHUBUSERNAME_DESC_AMY + PHONE_DESC_AMY
